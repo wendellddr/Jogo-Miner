@@ -5,7 +5,6 @@
 
 // --- Constantes ---
 const STORAGE_KEY = "coinClickerSave";
-const CUSTOMIZE_STORAGE_KEY = "coinClickerCustomize";
 
 // --- Variáveis do Jogo ---
 let gameState = {
@@ -27,208 +26,7 @@ let gameState = {
   lastPowerUse: 0,
 };
 
-// --- Variáveis de Customização ---
-let customizationState = {
-  theme: "default",
-};
-
-// --- Definições de Temas ---
-const THEME_DEFINITIONS = {
-  default: {
-    primary: "#FFC300",
-    secondary: "#FF5733",
-    darkBg: "#1a1a2e",
-    darkCard: "#2c2c54",
-    name: "Padrão",
-  },
-  neon: {
-    primary: "#FF0080",
-    secondary: "#00FFFF",
-    darkBg: "#0a0a1a",
-    darkCard: "#1a0a2e",
-    name: "Neon",
-  },
-  green: {
-    primary: "#10B981",
-    secondary: "#34D399",
-    darkBg: "#0a1a0e",
-    darkCard: "#1a2e1a",
-    name: "Natureza",
-  },
-  blue: {
-    primary: "#3B82F6",
-    secondary: "#60A5FA",
-    darkBg: "#0a0a1a",
-    darkCard: "#1a1a2e",
-    name: "Oceano",
-  },
-  pink: {
-    primary: "#EC4899",
-    secondary: "#F472B6",
-    darkBg: "#1a0a14",
-    darkCard: "#2e1a24",
-    name: "Rosa",
-  },
-  purple: {
-    primary: "#8B5CF6",
-    secondary: "#A78BFA",
-    darkBg: "#0f0a1a",
-    darkCard: "#1a0a2e",
-    name: "Mágico",
-  },
-  red: {
-    primary: "#EF4444",
-    secondary: "#F87171",
-    darkBg: "#1a0a0a",
-    darkCard: "#2e1a1a",
-    name: "Fogo",
-  },
-  dark: {
-    primary: "#9CA3AF",
-    secondary: "#D1D5DB",
-    darkBg: "#000000",
-    darkCard: "#111827",
-    name: "Escuro",
-  },
-  cyberpunk: {
-    primary: "#00F5FF",
-    secondary: "#FF00F5",
-    darkBg: "#050014",
-    darkCard: "#0a0028",
-    name: "Cyberpunk",
-  },
-};
-
-// Lista de UPGRADES ATIVOS (Inicialmente desbloqueados)
-// OBSERVAÇÃO: 'reforco_algoritmo' tem um PRÉ-REQUISITO de nível.
-let UPGRADE_DEFINITIONS = [
-  // Upgrade de Click inicial
-  {
-    id: "forca_manual",
-    name: "Força Manual",
-    description: "Aumenta a força muscular para cliques mais eficazes.",
-    icon: "✊",
-    baseCost: 10,
-    costMultiplier: 1.15,
-    baseGain: 0.05,
-    type: "click",
-  },
-
-  // Upgrade com Pré-Requisito (Não pode ser comprado antes do Nível 5 de Força Manual)
-  {
-    id: "reforco_algoritmo",
-    name: "Reforço de Algoritmo",
-    description: "Otimiza a taxa de crítico e eficiência de mineração.",
-    icon: "💎",
-    baseCost: 500,
-    costMultiplier: 1.2,
-    baseGain: 0.5,
-    type: "click",
-    prerequisite: { id: "forca_manual", level: 5 },
-  },
-
-  // Upgrade de Click original
-  {
-    id: "dedo_titanio",
-    name: "Dedo de Titânio",
-    description: "Melhora o ganho base por clique.",
-    icon: "💪",
-    baseCost: 15,
-    costMultiplier: 1.15,
-    baseGain: 0.1,
-    type: "click",
-  },
-
-  // Upgrades de Auto-Ganhos
-  {
-    id: "rato_automatico",
-    name: "Rato Automático",
-    description: "Um assistente que clica por você.",
-    icon: "🖱️",
-    baseCost: 100,
-    costMultiplier: 1.15,
-    baseGain: 1,
-    type: "auto",
-  },
-  {
-    id: "minerador_junior",
-    name: "Minerador Junior",
-    description: "Um minerador em treinamento.",
-    icon: "⛏️",
-    baseCost: 1000,
-    costMultiplier: 1.14,
-    baseGain: 10,
-    type: "auto",
-  },
-  {
-    id: "fazenda_clones",
-    name: "Fazenda de Clones",
-    description: "Clones minerando 24/7.",
-    icon: "🤖",
-    baseCost: 12000,
-    costMultiplier: 1.13,
-    baseGain: 80,
-    type: "auto",
-  },
-  {
-    id: "maquina_ouro",
-    name: "Máquina de Ouro",
-    description: "Criação de moedas em escala industrial.",
-    icon: "🏭",
-    baseCost: 150000,
-    costMultiplier: 1.12,
-    baseGain: 500,
-    type: "auto",
-  },
-];
-
-// Lista de UPGRADES BLOQUEADOS (Desbloqueio por CPS)
-let LOCKED_UPGRADES = [
-  {
-    id: "satelite_energia",
-    name: "Satelite de Energia",
-    description: "Otimiza a rede de mineração global.",
-    icon: "🛰️",
-    baseCost: 1000000,
-    costMultiplier: 1.11,
-    baseGain: 3000,
-    type: "auto",
-    unlockCPS: 1000,
-  },
-  {
-    id: "fusao_quantica",
-    name: "Fusão Quântica",
-    description: "Geração de moedas através de buracos de minhoca.",
-    icon: "🌌",
-    baseCost: 5000000,
-    costMultiplier: 1.1,
-    baseGain: 15000,
-    type: "auto",
-    unlockCPS: 5000,
-  },
-  {
-    id: "portal_temporal",
-    name: "Portal Temporal",
-    description: "Traz moedas de futuras linhas do tempo.",
-    icon: "🌀",
-    baseCost: 100000000,
-    costMultiplier: 1.09,
-    baseGain: 100000,
-    type: "auto",
-    unlockCPS: 50000,
-  },
-  {
-    id: "universo_paralelo",
-    name: "Universo Paralelo",
-    description: "Acesso a moedas em dimensões alternativas.",
-    icon: "🪐",
-    baseCost: 1000000000,
-    costMultiplier: 1.08,
-    baseGain: 1000000,
-    type: "auto",
-    unlockCPS: 500000,
-  },
-];
+// Upgrades são definidos em upgrades.js
 
 // Intervalo do jogo (para ganhos automáticos e salvamento)
 let gameInterval = null;
@@ -249,6 +47,7 @@ function saveGame() {
       powerActive: gameState.powerActive,
       powerStartTime: gameState.powerStartTime,
       lastPowerUse: gameState.lastPowerUse,
+      totalCoinsEarned: gameState.totalCoinsEarned || 0, // Salva progresso de mundos
       // Adiciona o tempo da última salvamento para calcular ganhos offline
       lastSaveTime: now,
     };
@@ -257,30 +56,6 @@ function saveGame() {
     console.log("Jogo salvo com sucesso.");
   } catch (e) {
     console.error("Erro ao salvar o jogo:", e);
-  }
-}
-
-function saveCustomization() {
-  try {
-    localStorage.setItem(
-      CUSTOMIZE_STORAGE_KEY,
-      JSON.stringify(customizationState)
-    );
-    console.log("Customização salva com sucesso.");
-  } catch (e) {
-    console.error("Erro ao salvar customização:", e);
-  }
-}
-
-function loadCustomization() {
-  try {
-    const savedData = localStorage.getItem(CUSTOMIZE_STORAGE_KEY);
-    if (savedData) {
-      customizationState = JSON.parse(savedData);
-      applyTheme(customizationState.theme);
-    }
-  } catch (e) {
-    console.warn("Erro ao carregar customização:", e);
   }
 }
 
@@ -293,16 +68,37 @@ function loadGame() {
       // Sobrescreve gameState com os dados salvos
       Object.assign(gameState, saveObject);
 
+      // Inicializa inventoryBuffs se não existir
+      if (!gameState.inventoryBuffs) {
+        gameState.inventoryBuffs = {
+          cpc_multiplier: 1,
+          cps_multiplier: 1,
+          critical_chance: 0,
+          critical_multiplier: 1,
+          total_multiplier: 1,
+        };
+      }
+
+      // Inicializa totalCoinsEarned se não existir (para progresso de mundos)
+      if (gameState.totalCoinsEarned === undefined) {
+        // Usa o total de moedas atuais como aproximação inicial
+        gameState.totalCoinsEarned = gameState.coins || 0;
+      }
+
       // Re-calcula CPS e CPC com os níveis carregados
       gameState.coinsPerSecond = calculateTotalCPS();
       gameState.coinsPerClick = calculateTotalCPC();
+
+      // Aplica buffs do inventário se existir
+      if (typeof applyInventoryBuffs === "function") {
+        applyInventoryBuffs();
+      }
 
       // Calcula ganhos offline
       if (saveObject.lastSaveTime) {
         const offlineDurationSeconds =
           (Date.now() - saveObject.lastSaveTime) / 1000;
-        const offlineGain =
-          gameState.coinsPerSecond * offlineDurationSeconds;
+        const offlineGain = gameState.coinsPerSecond * offlineDurationSeconds;
 
         if (offlineGain > 0) {
           gameState.coins += offlineGain;
@@ -415,18 +211,37 @@ function updateUI() {
   document.getElementById(
     "click-rate-display"
   ).textContent = `Moedas/Clique: ${formatNumber(currentCPC)}`;
-  document
-    .getElementById("click-button")
-    .querySelector(
-      "span:last-child"
-    ).textContent = `Minerar ( +${formatNumber(currentCPC)} )`;
+
+  // Atualiza texto do botão de clique usando tema se disponível
+  const clickButton = document.getElementById("click-button");
+  if (clickButton) {
+    const textSpan = clickButton.querySelector("span:last-child");
+    if (textSpan) {
+      let clickText = "Minerar";
+      if (typeof getCurrentTheme === "function") {
+        const theme = getCurrentTheme();
+        if (theme && theme.texts && theme.texts.clickButton) {
+          clickText = theme.texts.clickButton;
+        }
+      }
+      textSpan.textContent = `${clickText} ( +${formatNumber(currentCPC)} )`;
+    }
+  }
 
   // Atualiza Status de Crítico (Crit Chance)
-  document.getElementById(
-    "crit-display"
-  ).textContent = `Chance de Crítico: ${
-    gameState.criticalChance * 100
-  }% (x${gameState.criticalMultiplier})`;
+  let displayCriticalChance = gameState.criticalChance;
+  if (typeof getInventoryCriticalChance === "function") {
+    displayCriticalChance += getInventoryCriticalChance();
+  }
+
+  let displayCriticalMultiplier = gameState.criticalMultiplier;
+  if (typeof getInventoryCriticalMultiplier === "function") {
+    displayCriticalMultiplier *= getInventoryCriticalMultiplier();
+  }
+
+  document.getElementById("crit-display").textContent = `Chance de Crítico: ${(
+    displayCriticalChance * 100
+  ).toFixed(1)}% (x${displayCriticalMultiplier.toFixed(1)})`;
 
   // Atualiza Status de Power
   const powerButton = document.getElementById("power-button");
@@ -439,6 +254,14 @@ function updateUI() {
     const remaining = Math.ceil(gameState.powerDuration - elapsed);
     powerTimer.textContent = `Poder Ativo: ${remaining}s restantes! (Ganhos x${gameState.powerMultiplier})`;
     powerButton.textContent = "MODO HIPER-MINERAÇÃO ATIVO";
+    // Mantém emoji do tema
+    if (typeof getCurrentTheme === "function") {
+      const theme = getCurrentTheme();
+      if (theme && theme.emojis && theme.emojis.power) {
+        powerButton.textContent =
+          theme.emojis.power + " MODO HIPER-MINERAÇÃO ATIVO";
+      }
+    }
     powerButton.classList.remove(
       "bg-indigo-600",
       "hover:bg-indigo-700",
@@ -447,16 +270,19 @@ function updateUI() {
     );
     powerButton.classList.add("bg-green-500", "animate-pulse");
     powerButton.disabled = true;
-  } else if (
-    now - gameState.lastPowerUse <
-    gameState.powerCooldown * 1000
-  ) {
+  } else if (now - gameState.lastPowerUse < gameState.powerCooldown * 1000) {
     const cooldownRemaining = Math.ceil(
-      (gameState.powerCooldown * 1000 - (now - gameState.lastPowerUse)) /
-        1000
+      (gameState.powerCooldown * 1000 - (now - gameState.lastPowerUse)) / 1000
     );
     powerTimer.textContent = `Cooldown: ${cooldownRemaining}s`;
     powerButton.textContent = "Em Cooldown...";
+    // Mantém emoji do tema
+    if (typeof getCurrentTheme === "function") {
+      const theme = getCurrentTheme();
+      if (theme && theme.emojis && theme.emojis.power) {
+        powerButton.textContent = theme.emojis.power + " Em Cooldown...";
+      }
+    }
     powerButton.classList.remove(
       "bg-indigo-600",
       "hover:bg-indigo-700",
@@ -467,7 +293,19 @@ function updateUI() {
     powerButton.disabled = true;
   } else {
     powerTimer.textContent = `Cooldown: ${gameState.powerCooldown}s`;
-    powerButton.textContent = "Ativar Hyper-Mineração";
+    // Usa texto do tema se disponível
+    let powerText = "Ativar Hyper-Mineração";
+    if (typeof getCurrentTheme === "function") {
+      const theme = getCurrentTheme();
+      if (theme && theme.texts && theme.texts.powerButton) {
+        powerText = theme.texts.powerButton;
+      }
+      // Adiciona emoji se disponível
+      if (theme && theme.emojis && theme.emojis.power) {
+        powerText = theme.emojis.power + " " + powerText;
+      }
+    }
+    powerButton.textContent = powerText;
     powerButton.classList.remove(
       "bg-red-600",
       "cursor-not-allowed",
@@ -492,9 +330,7 @@ function updateUI() {
       const currentLevel = getUpgradeLevel(upgrade.prerequisite.id);
       if (currentLevel < requiredLevel) {
         isPrereqMet = false;
-        const prereqUpgrade = getUpgradeDefinition(
-          upgrade.prerequisite.id
-        );
+        const prereqUpgrade = getUpgradeDefinition(upgrade.prerequisite.id);
         prereqMessage = `Nível ${requiredLevel} de ${prereqUpgrade.name} necessário.`;
       }
     }
@@ -515,9 +351,7 @@ function updateUI() {
       "flex items-center justify-between p-4 rounded-xl transition duration-200";
 
     // Atualiza o display de pré-requisito
-    const prereqDisplay = document.getElementById(
-      `prereq-msg-${upgrade.id}`
-    );
+    const prereqDisplay = document.getElementById(`prereq-msg-${upgrade.id}`);
 
     if (!canBuy) {
       // Bloqueado por custo OU pré-requisito
@@ -541,6 +375,11 @@ function updateUI() {
       if (prereqDisplay) prereqDisplay.classList.add("hidden");
     }
   });
+
+  // Atualiza barra de progresso do mundo
+  if (typeof updateWorldProgress === "function") {
+    updateWorldProgress();
+  }
 }
 
 // --- Lógica de Ganhos e Cálculos (Infinitos) ---
@@ -573,6 +412,12 @@ function calculateTotalCPS() {
       totalCPS += upgrade.baseGain * level;
     }
   });
+
+  // Aplica buffs do inventário
+  if (typeof getInventoryCPSMultiplier === "function") {
+    totalCPS *= getInventoryCPSMultiplier();
+  }
+
   return totalCPS;
 }
 
@@ -586,6 +431,12 @@ function calculateTotalCPC() {
       totalCPC += upgrade.baseGain * level;
     }
   });
+
+  // Aplica buffs do inventário
+  if (typeof getInventoryCPCMultiplier === "function") {
+    totalCPC *= getInventoryCPCMultiplier();
+  }
+
   return totalCPC;
 }
 
@@ -599,8 +450,7 @@ let audioContext = null;
 function initAudioContext() {
   if (!audioContext) {
     try {
-      audioContext = new (window.AudioContext ||
-        window.webkitAudioContext)();
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
     } catch (error) {
       console.warn("Erro ao inicializar contexto de áudio:", error);
     }
@@ -832,12 +682,57 @@ function clickCoin() {
     earnedAmount *= gameState.powerMultiplier;
   }
 
-  if (Math.random() < gameState.criticalChance) {
-    earnedAmount *= gameState.criticalMultiplier;
+  // Aplica buffs do inventário
+  if (typeof getInventoryCPCMultiplier === "function") {
+    earnedAmount *= getInventoryCPCMultiplier();
+  }
+
+  // Calcula chance crítica com buffs do inventário
+  let criticalChance = gameState.criticalChance;
+  if (typeof getInventoryCriticalChance === "function") {
+    criticalChance += getInventoryCriticalChance();
+  }
+
+  if (Math.random() < criticalChance) {
+    // Aplica multiplicador crítico com buffs do inventário
+    let criticalMultiplier = gameState.criticalMultiplier;
+    if (typeof getInventoryCriticalMultiplier === "function") {
+      const inventoryMultiplier = getInventoryCriticalMultiplier();
+      criticalMultiplier *= inventoryMultiplier;
+    }
+    earnedAmount *= criticalMultiplier;
     isCritical = true;
+    // Rastreia golpe crítico
+    if (typeof trackCriticalHit === "function") {
+      trackCriticalHit();
+    }
+  }
+
+  // Tenta dropar item
+  if (typeof tryDropItem === "function") {
+    const droppedItem = tryDropItem();
+    if (droppedItem && typeof addItemToInventory === "function") {
+      addItemToInventory(droppedItem);
+    }
   }
 
   gameState.coins += earnedAmount;
+
+  // Rastreia total de moedas ganhas para progresso de mundos
+  if (gameState.totalCoinsEarned === undefined) {
+    gameState.totalCoinsEarned = 0;
+  }
+  gameState.totalCoinsEarned += earnedAmount;
+
+  // Rastreia clique
+  if (typeof trackClick === "function") {
+    trackClick();
+  }
+
+  // Rastreia moedas acumuladas
+  if (typeof trackCoins === "function") {
+    trackCoins(gameState.coins);
+  }
 
   const clickButton = document.getElementById("click-button");
 
@@ -868,6 +763,11 @@ function activatePower() {
     gameState.powerStartTime = now;
     gameState.lastPowerUse = now;
 
+    // Rastreia ativação do poder
+    if (typeof trackPowerActivated === "function") {
+      trackPowerActivated();
+    }
+
     showMessage(
       `MODO HIPER-MINERAÇÃO ATIVADO! Ganhos x${gameState.powerMultiplier}.`,
       false
@@ -885,10 +785,7 @@ function activatePower() {
     const remainingTime = Math.ceil(
       (cooldownTime - (now - gameState.lastPowerUse)) / 1000
     );
-    showMessage(
-      `O Poder está em cooldown. Faltam ${remainingTime}s.`,
-      true
-    );
+    showMessage(`O Poder está em cooldown. Faltam ${remainingTime}s.`, true);
   }
 }
 
@@ -901,12 +798,7 @@ function buyUpgrade(upgradeId) {
     const requiredLevel = upgrade.prerequisite.level;
     const currentLevel = getUpgradeLevel(upgrade.prerequisite.id);
     if (currentLevel < requiredLevel) {
-      const prereqUpgrade = getUpgradeDefinition(upgrade.prerequisite.id);
-      showMessage(
-        `Você precisa do upgrade '${prereqUpgrade.name}' no Nível ${requiredLevel} para comprar isso.`,
-        true
-      );
-      return; // Bloqueia a compra
+      return; // Bloqueia a compra sem mostrar mensagem
     }
   }
 
@@ -919,24 +811,16 @@ function buyUpgrade(upgradeId) {
     gameState.coinsPerSecond = calculateTotalCPS();
     gameState.coinsPerClick = calculateTotalCPC();
 
-    const nextLevel = getUpgradeLevel(upgradeId) + 1;
-    showMessage(
-      `Você comprou ${upgrade.name}! Próximo: Nível ${nextLevel}`,
-      false
-    );
+    // Rastreia compra de upgrade
+    if (typeof trackUpgradeBought === "function") {
+      trackUpgradeBought();
+    }
 
     // Toca o som de upgrade
     playUpgradeSound();
 
     updateUI();
     saveGame(); // Salva ao comprar
-  } else {
-    showMessage(
-      `Você não tem moedas suficientes para comprar ${
-        upgrade.name
-      }. Precisa de ${formatNumber(cost)} moedas.`,
-      true
-    );
   }
 }
 
@@ -973,11 +857,6 @@ function checkNewUpgrades() {
       LOCKED_UPGRADES.splice(i, 1);
       // Adiciona à lista de ativos
       UPGRADE_DEFINITIONS.push(upgrade);
-
-      showMessage(
-        `🚀 NOVO UPGRADE DESBLOQUEADO: ${upgrade.name}!`,
-        false
-      );
       unlocked = true;
     }
   }
@@ -1004,7 +883,9 @@ function gameLoop() {
   }
 
   if (currentCPS > 0 && deltaTime > 0) {
-    gameState.coins += currentCPS * deltaTime;
+    const earned = currentCPS * deltaTime;
+    gameState.coins += earned;
+    gameState.totalCoinsEarned += earned; // Rastreia total ganho para progresso
   }
 
   lastUpdateTime = now;
@@ -1012,6 +893,49 @@ function gameLoop() {
   // Checa novos unlocks a cada ciclo
   checkNewUpgrades();
 
+  // Rastreia CPS para conquistas
+  if (typeof trackCPS === "function") {
+    trackCPS(currentCPS);
+  }
+
+  updateUI();
+}
+
+/**
+ * Atualiza emojis dos upgrades baseado no tema atual
+ */
+function updateUpgradesEmojis() {
+  if (typeof getUpgradeEmoji === "function") {
+    // Atualiza upgrades ativos
+    UPGRADE_DEFINITIONS.forEach((upgrade) => {
+      const card = document.getElementById(`upgrade-card-${upgrade.id}`);
+      if (card) {
+        const iconSpan = card.querySelector("span.text-4xl");
+        if (iconSpan) {
+          iconSpan.textContent = getUpgradeEmoji(upgrade.id);
+        }
+      }
+    });
+    // Atualiza upgrades bloqueados
+    LOCKED_UPGRADES.forEach((upgrade) => {
+      const card = document.getElementById(`upgrade-card-${upgrade.id}`);
+      if (card) {
+        const iconSpan = card.querySelector("span.text-4xl");
+        if (iconSpan) {
+          iconSpan.textContent = getUpgradeEmoji(upgrade.id);
+        }
+      }
+    });
+  }
+}
+
+/**
+ * Atualiza emoji do botão de poder baseado no tema atual
+ * (Função mantida para compatibilidade, mas o emoji é aplicado diretamente no updateUI)
+ */
+function updatePowerButtonEmoji() {
+  // Emoji já é aplicado no updateUI através do texto do tema
+  // Esta função é chamada quando o tema muda para garantir atualização
   updateUI();
 }
 
@@ -1023,6 +947,12 @@ function renderUpgradeCard(upgrade, container, isLocked = false) {
   card.id = `upgrade-card-${upgrade.id}`;
   const level = getUpgradeLevel(upgrade.id);
   const gainTextType = upgrade.type === "click" ? "CPC" : "MPS";
+
+  // Obtém emoji do upgrade baseado no tema atual
+  let upgradeIcon = upgrade.icon;
+  if (typeof getUpgradeEmoji === "function") {
+    upgradeIcon = getUpgradeEmoji(upgrade.id);
+  }
 
   if (isLocked) {
     // Renderização para item BLOQUEADO (Dica)
@@ -1043,14 +973,12 @@ function renderUpgradeCard(upgrade, container, isLocked = false) {
       "flex items-center justify-between p-4 rounded-xl transition duration-200 bg-gray-700/50";
     card.innerHTML = `
             <div class="flex items-center space-x-4">
-                <span class="text-4xl">${upgrade.icon}</span>
+                <span class="text-4xl">${upgradeIcon}</span>
                 <div>
                     <p class="text-xl font-semibold">${
                       upgrade.name
                     } (Nível <span id="count-${upgrade.id}">${level}</span>)</p>
-                    <p class="text-sm text-gray-400">${
-                      upgrade.description
-                    }</p>
+                    <p class="text-sm text-gray-400">${upgrade.description}</p>
                     <p class="text-sm text-green-400">Ganha ${formatNumber(
                       upgrade.baseGain
                     )} ${gainTextType} por nível</p>
@@ -1071,158 +999,64 @@ function renderUpgradeCard(upgrade, container, isLocked = false) {
   container.appendChild(card);
 }
 
-// --- Funções de Customização ---
+// --- Funções de Customização (usando themes.js) ---
 
-function applyTheme(themeName) {
-  const theme = THEME_DEFINITIONS[themeName] || THEME_DEFINITIONS.default;
+/**
+ * Atualiza a barra de progresso do mundo
+ */
+function updateWorldProgress() {
+  if (
+    typeof getWorldProgress === "function" &&
+    typeof getCurrentWorld === "function"
+  ) {
+    const progress = getWorldProgress(gameState.totalCoinsEarned);
+    const currentWorld = getCurrentWorld();
+    const progressBar = document.getElementById("world-progress-bar");
+    const progressText = document.getElementById("world-progress-text");
+    const worldName = document.getElementById("current-world-name");
+    const advanceButton = document.getElementById("advance-world-button");
 
-  // Atualiza variáveis CSS customizadas
-  document.documentElement.style.setProperty(
-    "--theme-primary",
-    theme.primary
-  );
-  document.documentElement.style.setProperty(
-    "--theme-secondary",
-    theme.secondary
-  );
-  document.documentElement.style.setProperty(
-    "--theme-dark-bg",
-    theme.darkBg
-  );
-  document.documentElement.style.setProperty(
-    "--theme-dark-card",
-    theme.darkCard
-  );
-
-  // Atualiza background do body
-  document.body.style.backgroundColor = theme.darkBg;
-
-  // Atualiza cores dos elementos principais (títulos, textos primários)
-  const primaryElements = document.querySelectorAll(".text-primary");
-  primaryElements.forEach((el) => {
-    el.style.color = theme.primary;
-  });
-
-  // Atualiza background dos cards
-  const cards = document.querySelectorAll(".bg-dark-card");
-  cards.forEach((el) => {
-    el.style.backgroundColor = theme.darkCard;
-  });
-
-  // Atualiza cores dos botões principais
-  const clickButton = document.getElementById("click-button");
-  if (clickButton) {
-    clickButton.style.backgroundColor = theme.primary;
-    clickButton.style.color = "#1a1a2e";
-  }
-
-  // Atualiza cores secundárias (botões de crítico, etc)
-  const secondaryElements = document.querySelectorAll(".text-secondary");
-  secondaryElements.forEach((el) => {
-    el.style.color = theme.secondary;
-  });
-
-  // Atualiza cores do loading overlay
-  const loadingOverlay = document.getElementById("loading-overlay");
-  if (loadingOverlay) {
-    loadingOverlay.style.backgroundColor = theme.darkBg;
-  }
-
-  // Atualiza cores do modal
-  const modal = document.getElementById("customize-modal");
-  if (modal) {
-    const modalCard = modal.querySelector(".bg-dark-card");
-    if (modalCard) {
-      modalCard.style.backgroundColor = theme.darkCard;
+    if (worldName) {
+      worldName.textContent = `Mundo: ${currentWorld.name}`;
     }
-  }
 
-  // Atualiza cor do spinner de loading
-  const spinner = document.querySelector(
-    "#loading-overlay .border-primary"
-  );
-  if (spinner) {
-    spinner.style.borderColor = theme.primary;
-  }
-
-  // Atualiza seleção do tema no modal
-  document.querySelectorAll(".theme-option").forEach((option) => {
-    if (option.dataset.theme === themeName) {
-      option.classList.add(
-        "border-yellow-400",
-        "ring-4",
-        "ring-yellow-300"
-      );
-      option.classList.remove("border-transparent");
-    } else {
-      option.classList.remove(
-        "border-yellow-400",
-        "ring-4",
-        "ring-yellow-300"
-      );
-      option.classList.add("border-transparent");
+    if (progressBar) {
+      progressBar.style.width = `${progress.percent}%`;
     }
-  });
 
-  customizationState.theme = themeName;
-  saveCustomization();
-}
-
-function initializeCustomization() {
-  // Event listeners do modal
-  const customizeButton = document.getElementById("customize-button");
-  const customizeModal = document.getElementById("customize-modal");
-  const closeModal = document.getElementById("close-customize-modal");
-  const resetTheme = document.getElementById("reset-theme");
-
-  if (customizeButton) {
-    customizeButton.addEventListener("click", () => {
-      customizeModal.classList.remove("hidden");
-      // Atualiza seleção visual do tema atual
-      applyTheme(customizationState.theme);
-    });
-  }
-
-  if (closeModal) {
-    closeModal.addEventListener("click", () => {
-      customizeModal.classList.add("hidden");
-    });
-  }
-
-  if (resetTheme) {
-    resetTheme.addEventListener("click", () => {
-      applyTheme("default");
-      showMessage("Tema resetado para o padrão!", false);
-    });
-  }
-
-  // Event listeners dos temas
-  document.querySelectorAll(".theme-option").forEach((option) => {
-    option.addEventListener("click", () => {
-      const themeName = option.dataset.theme;
-      applyTheme(themeName);
-      showMessage(
-        `Tema "${THEME_DEFINITIONS[themeName].name}" aplicado!`,
-        false
-      );
-    });
-  });
-
-  // Fechar modal ao clicar fora
-  if (customizeModal) {
-    customizeModal.addEventListener("click", (e) => {
-      if (e.target === customizeModal) {
-        customizeModal.classList.add("hidden");
+    if (progressText) {
+      if (progress.hasNext) {
+        progressText.textContent = `${formatNumber(
+          progress.current
+        )} / ${formatNumber(progress.required)}`;
+      } else {
+        progressText.textContent = "Máximo";
       }
-    });
+    }
+
+    if (advanceButton) {
+      if (
+        progress.hasNext &&
+        typeof canAdvanceWorld === "function" &&
+        canAdvanceWorld(gameState.totalCoinsEarned)
+      ) {
+        advanceButton.classList.remove("hidden");
+        const nextWorld = getNextWorld();
+        if (nextWorld) {
+          advanceButton.textContent = `🌍 Avançar para ${nextWorld.name}`;
+        }
+      } else {
+        advanceButton.classList.add("hidden");
+      }
+    }
   }
 }
+
+// --- Sistema de Mundos (substituiu customização) ---
 
 function renderUpgradesInitial(appendOnly = false) {
   const activeContainer = document.getElementById("upgrades-container");
-  const lockedContainer = document.getElementById(
-    "locked-upgrades-container"
-  );
+  const lockedContainer = document.getElementById("locked-upgrades-container");
 
   if (!appendOnly) {
     activeContainer.innerHTML = "";
@@ -1251,8 +1085,20 @@ function renderUpgradesInitial(appendOnly = false) {
 // --- Inicialização do Jogo ---
 
 function startGame(loadSave = true) {
-  // Carrega customização primeiro para aplicar o tema antes de renderizar
-  loadCustomization();
+  // Inicializa mundos primeiro para aplicar antes de renderizar
+  if (typeof initializeWorlds === "function") {
+    initializeWorlds();
+  }
+
+  // Inicializa conquistas
+  if (typeof initializeAchievements === "function") {
+    initializeAchievements();
+  }
+
+  // Inicializa inventário
+  if (typeof initializeInventory === "function") {
+    initializeInventory();
+  }
 
   // Se for novo jogo, reseta o estado
   if (!loadSave) {
@@ -1269,6 +1115,14 @@ function startGame(loadSave = true) {
       powerCooldown: 60,
       powerStartTime: 0,
       lastPowerUse: 0,
+      totalCoinsEarned: 0, // Inicia com 0 para progresso de mundos
+      inventoryBuffs: {
+        cpc_multiplier: 1,
+        cps_multiplier: 1,
+        critical_chance: 0,
+        critical_multiplier: 1,
+        total_multiplier: 1,
+      },
     };
   } else {
     // Tenta carregar o jogo salvo
@@ -1279,10 +1133,23 @@ function startGame(loadSave = true) {
   gameState.coinsPerSecond = calculateTotalCPS();
   gameState.coinsPerClick = calculateTotalCPC();
 
+  // Garante que totalCoinsEarned existe
+  if (gameState.totalCoinsEarned === undefined) {
+    gameState.totalCoinsEarned = gameState.coins || 0;
+  }
+
   // Renderiza a estrutura inicial dos upgrades
   renderUpgradesInitial();
 
   updateUI();
+
+  // Aplica tema novamente após renderizar para atualizar textos e emojis
+  if (typeof getCurrentWorld === "function") {
+    const world = getCurrentWorld();
+    if (world && typeof applyTheme === "function") {
+      applyTheme(world.id);
+    }
+  }
 
   // Inicia o loop do jogo
   if (!gameInterval) {
@@ -1295,13 +1162,11 @@ function startGame(loadSave = true) {
   }
 
   // Adiciona listener do botão principal
-  document
-    .getElementById("click-button")
-    .addEventListener("click", () => {
-      // Inicializa o contexto de áudio na primeira interação
-      initAudioContext();
-      clickCoin();
-    });
+  document.getElementById("click-button").addEventListener("click", () => {
+    // Inicializa o contexto de áudio na primeira interação
+    initAudioContext();
+    clickCoin();
+  });
 
   // Adiciona o listener delegado ao container pai dos upgrades.
   document
@@ -1313,8 +1178,16 @@ function startGame(loadSave = true) {
     .getElementById("power-button")
     .addEventListener("click", activatePower);
 
-  // Inicializa sistema de customização
-  initializeCustomization();
+  // Adiciona listener para o botão de avançar mundo
+  const advanceButton = document.getElementById("advance-world-button");
+  if (advanceButton) {
+    advanceButton.addEventListener("click", () => {
+      if (typeof advanceToNextWorld === "function") {
+        advanceToNextWorld();
+        updateUI();
+      }
+    });
+  }
 
   // Remove a tela de carregamento
   const loadingOverlay = document.getElementById("loading-overlay");
@@ -1329,4 +1202,3 @@ function startGame(loadSave = true) {
     }
   }
 }
-
