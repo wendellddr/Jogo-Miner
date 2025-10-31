@@ -1,0 +1,105 @@
+/* Estilos do Jogo - Minerador de Moedas */
+
+body {
+  background-color: #1a1a2e;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
+}
+
+/* Estilo para o botão principal */
+.click-button {
+  transition: all 0.1s;
+  box-shadow: 0 10px 0 #e6a500;
+}
+
+.click-button:active {
+  box-shadow: 0 3px 0 #e6a500;
+  transform: translateY(7px);
+}
+
+/* Estilização para mensagens temporárias */
+.message-box {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+/* Estilização e Animação da Moeda Flutuante (+X.XX) */
+.floating-coin {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  opacity: 1;
+  /* Inicia a animação float-up */
+  animation: float-up 1s ease-out forwards;
+  white-space: nowrap; /* Garante que o texto não quebre */
+}
+
+@keyframes float-up {
+  0% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -100px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Efeito de brilho para cards que podem ser comprados */
+.afford-glow {
+  box-shadow: 0 0 15px rgba(255, 195, 0, 0.5); /* Brilho com a cor primária */
+}
+
+/* Estilo para cards bloqueados */
+.locked-card {
+  filter: grayscale(80%);
+  opacity: 0.7;
+  cursor: not-allowed;
+  border: 2px solid #5a5a7a;
+}
+
+/* Variáveis CSS para customização */
+:root {
+  --theme-primary: #ffc300;
+  --theme-secondary: #ff5733;
+  --theme-dark-bg: #1a1a2e;
+  --theme-dark-card: #2c2c54;
+}
+
+/* Estilos dinâmicos para customização */
+.customize-visible {
+  display: block !important;
+}
+
+/* Estilo para o menu inicial */
+.main-menu-overlay {
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Animação de fade-in para o menu */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Esconde o conteúdo do jogo inicialmente */
+.game-content {
+  display: none;
+}
+
+.game-content.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
