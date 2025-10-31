@@ -74,7 +74,7 @@
       <div class="text-center max-w-md mx-4">
         <div class="mb-8">
           <img
-            src="logo-minerador-moedas.png"
+            src="assets/logo-minerador-moedas.png"
             alt="Minerador de Moedas"
             class="mx-auto mb-4 max-w-xs h-auto"
           />
@@ -116,13 +116,30 @@
     <!-- Conteúdo do Jogo (escondido inicialmente) -->
     <div id="game-content" class="game-content flex-col items-center w-full">
       <header class="text-center mb-8">
-        <div class="flex justify-center items-center mb-4">
+        <div class="flex justify-between items-center mb-4 px-4">
+          <div class="flex items-center space-x-2">
+            <button
+              id="leaderboard-button"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg transition duration-150 shadow-md flex items-center space-x-2 text-sm sm:text-base"
+            >
+              <span>🏆</span>
+              <span class="hidden sm:inline">Ranking</span>
+            </button>
+            <button
+              id="my-id-button"
+              class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg transition duration-150 shadow-md flex items-center space-x-2 text-sm sm:text-base"
+            >
+              <span>🆔</span>
+              <span class="hidden sm:inline">Meu ID</span>
+            </button>
+          </div>
           <img
-            src="logo-minerador-moedas.png"
+            src="assets/logo-minerador-moedas.png"
             alt="Minerador de Moedas"
-            class="max-w-[200px] h-auto"
+            class="max-w-[150px] sm:max-w-[200px] h-auto"
             id="game-logo"
           />
+          <div class="w-[60px] sm:w-[100px]"></div> <!-- Spacer para alinhar -->
         </div>
         <p class="text-gray-400 text-sm mb-2">
           Progresso salvo automaticamente a cada 5 segundos.
@@ -269,15 +286,149 @@
           <p class="mt-4 text-xl text-primary">Iniciando Jogo...</p>
         </div>
       </div>
+
+      <!-- Sidebar de Ranking -->
+      <div
+        id="leaderboard-sidebar"
+        class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-dark-card shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto"
+      >
+        <!-- Header do Sidebar -->
+        <div class="sticky top-0 bg-dark-card border-b border-gray-700 p-4 flex justify-between items-center">
+          <h2 class="text-2xl font-bold text-primary">🏆 Ranking Online</h2>
+          <button
+            id="close-leaderboard"
+            class="text-gray-400 hover:text-white text-3xl font-bold transition"
+          >
+            ×
+          </button>
+        </div>
+
+        <!-- Conteúdo do Ranking -->
+        <div class="p-4">
+          <div id="leaderboard-list" class="space-y-2">
+            <div class="text-center text-gray-400 py-8">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+              <p class="text-sm">Carregando...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer do Sidebar -->
+        <div class="sticky bottom-0 bg-dark-card border-t border-gray-700 p-4 text-center">
+          <p class="text-xs text-gray-400">Atualização automática a cada 10s</p>
+        </div>
+      </div>
+
+      <!-- Overlay para fechar sidebar -->
+      <div
+        id="leaderboard-overlay"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+      ></div>
+
+      <!-- Modal de ID do Jogador -->
+      <div
+        id="player-id-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+      >
+        <!-- Loading Animation -->
+        <div id="loading-cloud-save" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[60]">
+          <div class="text-center">
+            <div class="text-6xl animate-mine-swing mb-4">⛏️</div>
+            <p class="text-xl text-primary font-bold">Carregando da nuvem...</p>
+            <p class="text-sm text-gray-400 mt-2">Aguarde um momento</p>
+          </div>
+        </div>
+
+        <div class="bg-dark-card rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
+          <h2 class="text-2xl font-bold text-primary mb-4 flex items-center space-x-2">
+            <span>☁️</span>
+            <span>Salvamento em Nuvem</span>
+          </h2>
+
+          <!-- Seção: Usar ID existente -->
+          <div class="mb-4">
+            <div class="bg-blue-900/20 border border-blue-600 rounded-lg p-4">
+              <h3 class="text-sm font-bold text-blue-300 mb-2 flex items-center space-x-2">
+                <span>🔄</span>
+                <span>Carregar de outro dispositivo</span>
+              </h3>
+              <p class="text-xs text-gray-400 mb-3">
+                Cole seu ID para carregar o progresso de outro lugar
+              </p>
+              <div class="flex items-center space-x-2">
+                <input
+                  type="text"
+                  id="load-id-input"
+                  placeholder="Cole seu ID aqui..."
+                  class="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg font-mono text-xs border-2 border-gray-600 focus:border-primary"
+                />
+                <button
+                  id="load-id-button"
+                  class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition whitespace-nowrap"
+                >
+                  Carregar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção: Meu ID -->
+          <div class="border-t border-gray-700 pt-4 mb-4">
+            <div class="bg-green-900/20 border border-green-600 rounded-lg p-4">
+              <h3 class="text-sm font-bold text-green-300 mb-2 flex items-center space-x-2">
+                <span>🆔</span>
+                <span>Meu ID único</span>
+              </h3>
+              <p class="text-xs text-gray-400 mb-3">
+                Use este ID para acessar seu jogo em qualquer dispositivo
+              </p>
+              <div class="flex items-center space-x-2">
+                <input
+                  type="text"
+                  id="player-id-display"
+                  readonly
+                  class="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg font-mono text-xs border-2 border-gray-600"
+                  value="Carregando..."
+                />
+                <button
+                  id="copy-id-button"
+                  class="bg-primary hover:bg-yellow-400 text-dark-bg font-bold py-2 px-3 rounded-lg transition"
+                  title="Copiar ID"
+                >
+                  📋
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-700/30 rounded-lg p-3 mb-4">
+            <p class="text-xs text-gray-300 text-center">
+              💡 <strong>Como usar:</strong> Copie seu ID e salve em um lugar seguro. Use-o em qualquer dispositivo para manter seu progresso sincronizado!
+            </p>
+          </div>
+
+          <button
+            id="close-id-modal"
+            class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition"
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
     </div>
     <!-- Fim do Conteúdo do Jogo -->
 
     <!-- Scripts -->
-    <script src="themes.js"></script>
-    <script src="achievements.js"></script>
-    <script src="inventory.js"></script>
-    <script src="upgrades.js"></script>
-    <script src="game.js"></script>
-    <script src="menu.js"></script>
+    <!-- Core Systems -->
+    <script src="js/core/game.js"></script>
+    <script src="js/core/menu.js"></script>
+    <!-- Systems -->
+    <script src="js/systems/auth.js"></script>
+    <script src="js/systems/cloud-save.js"></script>
+    <script src="js/systems/leaderboard.js"></script>
+    <script src="js/systems/themes.js"></script>
+    <script src="js/systems/achievements.js"></script>
+    <script src="js/systems/inventory.js"></script>
+    <script src="js/systems/upgrades.js"></script>
   </body>
 </html>

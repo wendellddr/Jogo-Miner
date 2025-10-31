@@ -39,19 +39,26 @@ function getOrCreatePlayerId() {
  * Carrega o nome do jogador salvo e o ranking
  */
 function initializeLeaderboard() {
-  // Carrega/cria ID único do jogador
-  playerId = getOrCreatePlayerId();
-  
-  // Carrega o nome do jogador salvo
-  const savedName = localStorage.getItem("playerName");
-  if (savedName) {
-    playerName = savedName;
+  // Tenta usar ID de usuário autenticado primeiro
+  if (typeof getCurrentUser === "function" && getCurrentUser()) {
+    const user = getCurrentUser();
+    playerId = user.id;
+    playerName = user.username;
+    console.log("🎮 Usuário logado:", playerName, "| ID:", playerId);
+  } else {
+    // Fallback para ID único gerado
+    playerId = getOrCreatePlayerId();
+    
+    // Carrega o nome do jogador salvo
+    const savedName = localStorage.getItem("playerName");
+    if (savedName) {
+      playerName = savedName;
+    }
+    console.log("🎮 Jogador ID:", playerId, "| Nome:", playerName || "Sem nome");
   }
 
   // Inicializa timestamp de atividade para começar no modo normal
   lastPlayerAction = Date.now();
-
-  console.log("🎮 Jogador ID:", playerId, "| Nome:", playerName || "Sem nome");
 
   // Carrega o ranking
   loadLeaderboard();
@@ -188,16 +195,32 @@ async function submitScore(score, coins) {
       leaderboardData = leaderboardData.slice(0, 100);
     }
 
-    // Salva no servidor (apenas PUT, sem GET antes - economia de 50%!)
+    // Salva no servidor (preservando auth e cloudSaves se existirem)
+    const savePayload = { leaderboard: leaderboardData };
+    
+    // Tenta preservar auth e cloudSaves se existirem no bin
+    try {
+      const currentData = await fetch(LEADERBOARD_API_URL + "/latest", {
+        headers: { "X-Master-Key": LEADERBOARD_API_KEY },
+      }).then(r => r.json());
+      
+      if (currentData.record && currentData.record.auth) {
+        savePayload.auth = currentData.record.auth;
+      }
+      if (currentData.record && currentData.record.cloudSaves) {
+        savePayload.cloudSaves = currentData.record.cloudSaves;
+      }
+    } catch (e) {
+      // Ignora erro - bin pode estar vazio ou diferente
+    }
+    
     const response = await fetch(LEADERBOARD_API_URL, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         "X-Master-Key": LEADERBOARD_API_KEY,
       },
-      body: JSON.stringify({
-        leaderboard: leaderboardData,
-      }),
+      body: JSON.stringify(savePayload),
     });
 
     if (response.ok) {
@@ -364,13 +387,26 @@ function stopAutoRefresh() {
   }
 }
 
+// Função de inicialização
+function initLeaderboardSystem() {
+  initializeLeaderboard();
+  // Inicia atualização automática
+  startAutoRefresh();
+  // Inicializa UI do sidebar
+  initializeLeaderboardSidebar();
+  // Inicializa UI do modal de ID
+  initializePlayerIdModal();
+}
+
 // Inicializa quando o script carrega
 if (typeof window !== "undefined") {
-  window.addEventListener("DOMContentLoaded", () => {
-    initializeLeaderboard();
-    // Inicia atualização automática
-    startAutoRefresh();
-  });
+  // Se o DOM já carregou, inicializa imediatamente
+  if (document.readyState === "loading") {
+    window.addEventListener("DOMContentLoaded", initLeaderboardSystem);
+  } else {
+    // DOM já carregado, inicializa agora
+    initLeaderboardSystem();
+  }
   
   // Para atualização automática quando a aba é minimizada (opcional)
   document.addEventListener("visibilitychange", () => {
@@ -382,3 +418,206 @@ if (typeof window !== "undefined") {
   });
 }
 
+/**
+ * Inicializa a UI do sidebar de ranking
+ */
+function initializeLeaderboardSidebar() {
+  const leaderboardButton = document.getElementById("leaderboard-button");
+  const closeButton = document.getElementById("close-leaderboard");
+  const overlay = document.getElementById("leaderboard-overlay");
+  const sidebar = document.getElementById("leaderboard-sidebar");
+
+  // Abrir sidebar
+  if (leaderboardButton) {
+    leaderboardButton.addEventListener("click", () => {
+      if (sidebar) {
+        sidebar.classList.remove("translate-x-full");
+        if (overlay) overlay.classList.remove("hidden");
+        markPlayerActivity();
+      }
+    });
+  }
+
+  // Fechar sidebar
+  if (closeButton) {
+    closeButton.addEventListener("click", () => closeLeaderboardSidebar());
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", () => closeLeaderboardSidebar());
+  }
+
+  // Fechar com ESC
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeLeaderboardSidebar();
+    }
+  });
+}
+
+/**
+ * Fecha o sidebar de ranking
+ */
+function closeLeaderboardSidebar() {
+  const sidebar = document.getElementById("leaderboard-sidebar");
+  const overlay = document.getElementById("leaderboard-overlay");
+  
+  if (sidebar) {
+    sidebar.classList.add("translate-x-full");
+  }
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
+}
+
+/**
+ * Inicializa a UI do modal de ID
+ */
+function initializePlayerIdModal() {
+  const myIdButton = document.getElementById("my-id-button");
+  const closeIdModal = document.getElementById("close-id-modal");
+  const modal = document.getElementById("player-id-modal");
+  const playerIdDisplay = document.getElementById("player-id-display");
+  const copyIdButton = document.getElementById("copy-id-button");
+  const loadIdButton = document.getElementById("load-id-button");
+  const loadIdInput = document.getElementById("load-id-input");
+
+  // Abrir modal
+  if (myIdButton) {
+    myIdButton.addEventListener("click", () => {
+      if (modal && playerIdDisplay) {
+        // Atualiza o ID exibido
+        const currentId = getCurrentPlayerIdForCloud();
+        if (currentId) {
+          playerIdDisplay.value = currentId;
+        } else {
+          playerIdDisplay.value = "Sem ID";
+        }
+        modal.classList.remove("hidden");
+      }
+    });
+  }
+
+  // Fechar modal
+  if (closeIdModal) {
+    closeIdModal.addEventListener("click", () => {
+      if (modal) modal.classList.add("hidden");
+    });
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.classList.add("hidden");
+      }
+    });
+  }
+
+  // Copiar ID
+  if (copyIdButton) {
+    copyIdButton.addEventListener("click", () => {
+      if (playerIdDisplay && playerIdDisplay.value !== "Sem ID") {
+        playerIdDisplay.select();
+        document.execCommand("copy");
+        copyIdButton.textContent = "✓ Copiado!";
+        setTimeout(() => {
+          copyIdButton.textContent = "📋";
+        }, 2000);
+      }
+    });
+  }
+
+  // Carregar de outro ID
+  if (loadIdButton && loadIdInput) {
+    loadIdButton.addEventListener("click", async () => {
+      const idToLoad = loadIdInput.value.trim();
+      if (!idToLoad) {
+        alert("Por favor, insira um ID válido");
+        return;
+      }
+
+      // Mostra loading
+      const loadingElement = document.getElementById("loading-cloud-save");
+      if (loadingElement) {
+        loadingElement.classList.remove("hidden");
+      }
+      
+      // Desabilita o botão durante o carregamento
+      loadIdButton.disabled = true;
+      loadIdButton.textContent = "Carregando...";
+
+      // Salva o ID temporariamente
+      const originalId = localStorage.getItem("playerUniqueId");
+      
+      try {
+        // Troca o ID
+        localStorage.setItem("playerUniqueId", idToLoad);
+        
+        // Força carregar da nuvem
+        if (typeof forceLoadFromCloud === "function") {
+          const cloudData = await forceLoadFromCloud();
+          
+          if (cloudData && typeof startGame === "function") {
+            // Carrega o save da nuvem
+            localStorage.setItem("coinClickerSave", JSON.stringify(cloudData));
+            
+            // Esconde loading antes de recarregar
+            if (loadingElement) {
+              loadingElement.classList.add("hidden");
+            }
+            
+            // Recarrega a página
+            window.location.reload();
+          } else {
+            // Esconde loading
+            if (loadingElement) {
+              loadingElement.classList.add("hidden");
+            }
+            
+            alert("Nenhum jogo encontrado para este ID na nuvem.");
+            // Restaura ID original
+            if (originalId) {
+              localStorage.setItem("playerUniqueId", originalId);
+            } else {
+              localStorage.removeItem("playerUniqueId");
+            }
+            
+            // Reabilita o botão
+            loadIdButton.disabled = false;
+            loadIdButton.textContent = "Carregar";
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar jogo da nuvem:", error);
+        
+        // Esconde loading
+        if (loadingElement) {
+          loadingElement.classList.add("hidden");
+        }
+        
+        alert("Erro ao carregar jogo da nuvem. Tente novamente.");
+        // Restaura ID original
+        if (originalId) {
+          localStorage.setItem("playerUniqueId", originalId);
+        } else {
+          localStorage.removeItem("playerUniqueId");
+        }
+        
+        // Reabilita o botão
+        loadIdButton.disabled = false;
+        loadIdButton.textContent = "Carregar";
+      }
+    });
+  }
+}
+
+// Exporta funções globais
+if (typeof window !== "undefined") {
+  window.submitScore = submitScore;
+  window.getPlayerName = getPlayerName;
+  window.setPlayerName = setPlayerName;
+  window.getPlayerRank = getPlayerRank;
+  window.getPlayerScore = getPlayerScore;
+  window.loadLeaderboard = loadLeaderboard;
+  window.markPlayerActivity = markPlayerActivity;
+}

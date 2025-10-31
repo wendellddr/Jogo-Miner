@@ -54,6 +54,16 @@ function saveGame() {
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(saveObject));
     console.log("Jogo salvo com sucesso.");
+    
+    // Submete pontuação ao ranking online
+    if (typeof submitScore === "function") {
+      submitScore(gameState.coins, gameState.coins);
+    }
+    
+    // Salva na nuvem também
+    if (typeof saveGameToCloud === "function") {
+      saveGameToCloud(saveObject);
+    }
   } catch (e) {
     console.error("Erro ao salvar o jogo:", e);
   }
