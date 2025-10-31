@@ -377,10 +377,11 @@ Contribuições são bem-vindas! Para contribuir:
 
 Este projeto está sob licença MIT. Sinta-se livre para usar, modificar e distribuir.
 
-## 👤 Autor
+## 👥 Autores
 
 **Emerson**
 - GitHub: [@EmerHoff](https://github.com/EmerHoff)
+
 **Wendell**
 - GitHub: [@wendellddr](https://github.com/wendellddr)
 
