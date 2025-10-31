@@ -59,7 +59,7 @@
         ⚠️ IMPORTANTE: Adicione o caminho da sua música aqui!
         Se deixar vazio, o jogo funcionará mas sem música.
       -->
-      <source src="" type="audio/mpeg">
+      <source src="" type="audio/mpeg" />
       <!-- 
         Exemplo (substitua pelo caminho da sua música):
         <source src="mining-background.mp3" type="audio/mpeg">
@@ -73,10 +73,11 @@
     >
       <div class="text-center max-w-md mx-4">
         <div class="mb-8">
-          <h1 class="text-6xl font-extrabold text-primary tracking-tight mb-4">
-            💎 Minerador
-          </h1>
-          <h2 class="text-3xl font-bold text-primary mb-2">de Moedas</h2>
+          <img
+            src="logo-minerador-moedas.png"
+            alt="Minerador de Moedas"
+            class="mx-auto mb-4 max-w-xs h-auto"
+          />
           <p class="text-gray-400 text-lg mt-4">
             Clique, mine e construa seu império!
           </p>
@@ -115,76 +116,116 @@
     <!-- Conteúdo do Jogo (escondido inicialmente) -->
     <div id="game-content" class="game-content flex-col items-center w-full">
       <header class="text-center mb-8">
-        <div class="flex justify-between items-center mb-4">
-          <div class="flex-1"></div>
-          <h1 class="text-4xl font-extrabold text-primary tracking-tight flex-1">
-            Minerador de Moedas
-          </h1>
-          <div class="flex-1 flex justify-end">
-            <button
-              id="customize-button"
-              class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md flex items-center space-x-2"
-            >
-              <span>🎨</span>
-              <span>Customizar</span>
-            </button>
-          </div>
+        <div class="flex justify-center items-center mb-4">
+          <img
+            src="logo-minerador-moedas.png"
+            alt="Minerador de Moedas"
+            class="max-w-[200px] h-auto"
+            id="game-logo"
+          />
         </div>
-        <p class="text-gray-400 text-sm">
+        <p class="text-gray-400 text-sm mb-2">
           Progresso salvo automaticamente a cada 5 segundos.
         </p>
+
+        <!-- Barra de Progresso do Mundo -->
+        <div class="w-full max-w-md mx-auto mt-4">
+          <div class="flex items-center justify-between mb-2">
+            <span
+              class="text-xs font-semibold text-primary"
+              id="current-world-name"
+            >
+              Mundo: Natureza
+            </span>
+            <span class="text-xs text-gray-400" id="world-progress-text">
+              0 / 10,000
+            </span>
+          </div>
+          <div class="w-full bg-gray-700 rounded-full h-3 mb-2">
+            <div
+              id="world-progress-bar"
+              class="bg-primary h-3 rounded-full transition-all duration-300"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button
+            id="advance-world-button"
+            class="hidden w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all duration-200 transform hover:scale-105"
+          >
+            🌍 Avançar para o Próximo Mundo
+          </button>
+        </div>
       </header>
 
-      <main class="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Painel de Estatísticas e Clicker -->
+      <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Painel de Estatísticas e Clicker (menor) -->
         <section
-          class="lg:col-span-1 bg-dark-card p-6 rounded-xl shadow-2xl flex flex-col items-center"
+          class="lg:col-span-3 bg-dark-card p-4 rounded-xl shadow-2xl flex flex-col items-center"
         >
-          <h2 class="text-2xl font-bold mb-4 text-primary">Moedas Atuais</h2>
+          <h2 class="text-xl font-bold mb-3 text-primary">Moedas Atuais</h2>
 
           <p
             id="coins-display"
-            class="text-6xl font-black mb-4 transition-transform duration-300"
+            class="text-4xl font-black mb-3 transition-transform duration-300"
           >
             0.00
           </p>
 
           <!-- CPS Display com multiplicador de Power ativo (se houver) -->
-          <p id="cps-display" class="text-lg text-gray-300 mb-6">
+          <p id="cps-display" class="text-sm text-gray-300 mb-4">
             0.00 Moedas/Segundo
           </p>
 
           <!-- Botão Principal de Click -->
           <button
             id="click-button"
-            class="click-button bg-primary text-dark-bg font-extrabold py-5 px-10 rounded-full text-xl shadow-xl hover:bg-yellow-400 transition duration-150 flex items-center justify-center space-x-2"
+            class="click-button bg-primary text-dark-bg font-extrabold py-3 px-6 rounded-full text-base shadow-xl hover:bg-yellow-400 transition duration-150 flex items-center justify-center space-x-2 w-full"
           >
-            <span class="text-3xl">💰</span>
-            <span>Minerar ( +1 )</span>
+            <span class="text-2xl">💰</span>
+            <span class="text-xs">Minerar ( +1 )</span>
           </button>
 
           <!-- Display de CPC com multiplicador de Power ativo (se houver) -->
-          <p id="click-rate-display" class="text-md text-gray-400 mt-3">
+          <p id="click-rate-display" class="text-xs text-gray-400 mt-2">
             Moedas/Clique: 1
           </p>
 
           <!-- Display de Crítico -->
-          <p id="crit-display" class="text-md text-red-400 mt-1">
+          <p id="crit-display" class="text-xs text-red-400 mt-1">
             Chance de Crítico: 5% (x10)
           </p>
 
           <!-- Botão de Poder -->
           <button
             id="power-button"
-            class="mt-6 w-full py-3 px-6 rounded-lg font-bold transition duration-150 shadow-md bg-indigo-600 hover:bg-indigo-700 text-white"
+            class="mt-4 w-full py-2 px-4 rounded-lg font-bold text-sm transition duration-150 shadow-md bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             Ativar Hyper-Mineração
           </button>
-          <p id="power-timer" class="text-sm text-gray-400 mt-2"></p>
+          <p id="power-timer" class="text-xs text-gray-400 mt-1"></p>
+
+          <!-- Mochila -->
+          <div class="mt-6 w-full">
+            <h3 class="text-sm font-bold mb-2 text-primary">Mochila (Ativo)</h3>
+            <div id="bag-container" class="grid grid-cols-3 gap-2 mb-3">
+              <!-- Itens da mochila serão inseridos aqui pelo JavaScript -->
+            </div>
+          </div>
+
+          <!-- Inventário -->
+          <div class="mt-2 w-full">
+            <h3 class="text-sm font-bold mb-2 text-primary">Inventário</h3>
+            <div
+              id="inventory-container"
+              class="grid grid-cols-4 gap-2 max-h-[200px] overflow-y-auto"
+            >
+              <!-- Itens serão inseridos aqui pelo JavaScript -->
+            </div>
+          </div>
         </section>
 
         <!-- Painel de Upgrades -->
-        <section class="lg:col-span-2 bg-dark-card p-6 rounded-xl shadow-2xl">
+        <section class="lg:col-span-6 bg-dark-card p-6 rounded-xl shadow-2xl">
           <h2
             class="text-2xl font-bold mb-6 text-primary border-b border-primary/50 pb-2"
           >
@@ -196,6 +237,22 @@
           <!-- Container para Upgrades Bloqueados que dão dica -->
           <div id="locked-upgrades-container" class="space-y-4 mt-6">
             <!-- Dicas de Upgrades Bloqueados serão inseridas aqui -->
+          </div>
+        </section>
+
+        <!-- Painel de Conquistas (Lateral Direita) -->
+        <section class="lg:col-span-3 bg-dark-card p-4 rounded-xl shadow-2xl">
+          <h2
+            class="text-xl font-bold mb-4 text-primary flex items-center space-x-2"
+          >
+            <span>🏆</span>
+            <span>Conquistas</span>
+          </h2>
+          <div
+            id="achievements-container"
+            class="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto"
+          >
+            <!-- Conquistas serão inseridas aqui pelo JavaScript -->
           </div>
         </section>
       </main>
@@ -212,160 +269,15 @@
           <p class="mt-4 text-xl text-primary">Iniciando Jogo...</p>
         </div>
       </div>
-
-      <!-- Modal de Customização -->
-      <div
-        id="customize-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-      >
-        <div
-          class="bg-dark-card p-8 rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto"
-        >
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold text-primary">
-              🎨 Menu de Customização
-            </h2>
-            <button
-              id="close-customize-modal"
-              class="text-gray-400 hover:text-white text-3xl font-bold transition duration-150"
-            >
-              &times;
-            </button>
-          </div>
-
-          <div class="mb-6">
-            <p class="text-gray-300 mb-4">
-              Personalize seu jogo! Escolha um tema que combine com seu estilo de
-              mineração! 💎
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Tema Padrão -->
-            <div
-              class="theme-option bg-gradient-to-br from-yellow-500 to-orange-500 p-6 rounded-xl cursor-pointer transition-transform duration-200 hover:scale-105 border-4 border-transparent"
-              data-theme="default"
-            >
-              <div class="text-center">
-                <div class="text-4xl mb-2">✨</div>
-                <h3 class="text-xl font-bold text-white mb-2">Padrão</h3>
-                <p class="text-sm text-white/90">Tema original dourado</p>
-              </div>
-            </div>
-
-            <!-- Tema Neon -->
-            <div
-              class="theme-option bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 p-6 rounded-xl cursor-pointer transition-transform duration-200 hover:scale-105 border-4 border-transparent"
-              data-theme="neon"
-            >
-              <div class="text-center">
-                <div class="text-4xl mb-2">🌈</div>
-                <h3 class="text-xl font-bold text-white mb-2">Neon</h3>
-                <p class="text-sm text-white/90">Arco-íris vibrante</p>
-              </div>
-            </div>
-
-            <!-- Tema Verde -->
-            <div
-              class="theme-option bg-gradient-to-br from-green-400 to-emerald-600 p-6 rounded-xl cursor-pointer transition-transform duration-200 hover:scale-105 border-4 border-transparent"
-              data-theme="green"
-            >
-              <div class="text-center">
-                <div class="text-4xl mb-2">🌿</div>
-                <h3 class="text-xl font-bold text-white mb-2">Natureza</h3>
-                <p class="text-sm text-white/90">Verde refrescante</p>
-              </div>
-            </div>
-
-            <!-- Tema Azul -->
-            <div
-              class="theme-option bg-gradient-to-br from-blue-400 to-cyan-500 p-6 rounded-xl cursor-pointer transition-transform duration-200 hover:scale-105 border-4 border-transparent"
-              data-theme="blue"
-            >
-              <div class="text-center">
-                <div class="text-4xl mb-2">🌊</div>
-                <h3 class="text-xl font-bold text-white mb-2">Oceano</h3>
-                <p class="text-sm text-white/90">Azul profundo</p>
-              </div>
-            </div>
-
-            <!-- Tema Rosa -->
-            <div
-              class="theme-option bg-gradient-to-br from-pink-400 to-rose-500 p-6 rounded-xl cursor-pointer transition-transform duration-200 hover:scale-105 border-4 border-transparent"
-              data-theme="pink"
-            >
-              <div class="text-center">
-                <div class="text-4xl mb-2">💖</div>
-                <h3 class="text-xl font-bold text-white mb-2">Rosa</h3>
-                <p class="text-sm text-white/90">Doce e suave</p>
-              </div>
-            </div>
-
-            <!-- Tema Roxo -->
-            <div
-              class="theme-option bg-gradient-to-br from-purple-600 to-indigo-700 p-6 rounded-xl cursor-pointer transition-transform duration-200 hover:scale-105 border-4 border-transparent"
-              data-theme="purple"
-            >
-              <div class="text-center">
-                <div class="text-4xl mb-2">🔮</div>
-                <h3 class="text-xl font-bold text-white mb-2">Mágico</h3>
-                <p class="text-sm text-white/90">Roxo místico</p>
-              </div>
-            </div>
-
-            <!-- Tema Vermelho -->
-            <div
-              class="theme-option bg-gradient-to-br from-red-500 to-orange-600 p-6 rounded-xl cursor-pointer transition-transform duration-200 hover:scale-105 border-4 border-transparent"
-              data-theme="red"
-            >
-              <div class="text-center">
-                <div class="text-4xl mb-2">🔥</div>
-                <h3 class="text-xl font-bold text-white mb-2">Fogo</h3>
-                <p class="text-sm text-white/90">Vermelho intenso</p>
-              </div>
-            </div>
-
-            <!-- Tema Dark -->
-            <div
-              class="theme-option bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl cursor-pointer transition-transform duration-200 hover:scale-105 border-4 border-transparent"
-              data-theme="dark"
-            >
-              <div class="text-center">
-                <div class="text-4xl mb-2">🌙</div>
-                <h3 class="text-xl font-bold text-white mb-2">Escuro</h3>
-                <p class="text-sm text-white/90">Noturno elegante</p>
-              </div>
-            </div>
-
-            <!-- Tema Cyberpunk -->
-            <div
-              class="theme-option bg-gradient-to-br from-teal-400 via-purple-500 to-pink-500 p-6 rounded-xl cursor-pointer transition-transform duration-200 hover:scale-105 border-4 border-transparent"
-              data-theme="cyberpunk"
-            >
-              <div class="text-center">
-                <div class="text-4xl mb-2">🤖</div>
-                <h3 class="text-xl font-bold text-white mb-2">Cyberpunk</h3>
-                <p class="text-sm text-white/90">Futurista</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-6 text-center">
-            <button
-              id="reset-theme"
-              class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition duration-150"
-            >
-              Resetar para Padrão
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
     <!-- Fim do Conteúdo do Jogo -->
 
     <!-- Scripts -->
+    <script src="themes.js"></script>
+    <script src="achievements.js"></script>
+    <script src="inventory.js"></script>
+    <script src="upgrades.js"></script>
     <script src="game.js"></script>
     <script src="menu.js"></script>
   </body>
 </html>
-
