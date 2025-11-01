@@ -346,13 +346,9 @@ function getUpgradeEmoji(upgradeId) {
   
   if (!upgrade) return "❓";
   
-  // Se o upgrade tem uma imagem customizada explícita, retorna HTML da imagem
-  if (upgrade.image) {
-    return `<img src="${upgrade.image}" alt="${upgrade.name}" class="w-full h-full object-contain item-image" />`;
-  }
-  
-  // Tenta carregar automaticamente de assets/upgrades/[id].png
-  const imagePath = `assets/upgrades/${upgradeId}.png`;
+  // Se o upgrade tem uma imagem customizada explícita, usa ela
+  // Caso contrário, tenta carregar automaticamente de assets/upgrades/[id].png
+  const imagePath = upgrade.image || `assets/upgrades/${upgradeId}.png`;
   
   // Sempre tenta primeiro a imagem e deixa o CSS fallback do emoji
   return `<img src="${imagePath}" alt="${upgrade.name}" class="w-full h-full object-contain item-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" /><span style="display:none;">${upgrade.icon}</span>`;

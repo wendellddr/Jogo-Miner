@@ -551,6 +551,27 @@ function initializeGameMenu() {
     });
   }
 
+  // Abre Inventário
+  const inventoryButton = document.getElementById("menu-inventory-button");
+  if (inventoryButton) {
+    inventoryButton.addEventListener("click", () => {
+      menuSidebar.classList.add("-translate-x-full");
+      menuOverlay.classList.add("hidden");
+      
+      // Abre o sidebar de inventário diretamente
+      const inventorySidebar = document.getElementById("inventory-sidebar");
+      const inventoryOverlay = document.getElementById("inventory-overlay");
+      
+      if (inventorySidebar && inventoryOverlay) {
+        if (typeof renderInventory === "function") {
+          renderInventory();
+        }
+        inventorySidebar.classList.remove("translate-x-full");
+        inventoryOverlay.classList.remove("hidden");
+      }
+    });
+  }
+
   // Abre Estatísticas
   const statsButton = document.getElementById("menu-stats-button");
   if (statsButton) {
