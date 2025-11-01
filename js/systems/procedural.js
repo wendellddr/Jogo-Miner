@@ -99,10 +99,47 @@ function saveProcedural() {
 }
 
 /**
+ * Inicializa a sidebar de Motor Quântico
+ */
+let proceduralSidebarInitialized = false;
+function initializeProceduralSidebar() {
+  if (proceduralSidebarInitialized) return;
+  
+  const closeButton = document.getElementById("close-procedural");
+  const sidebar = document.getElementById("procedural-sidebar");
+  const overlay = document.getElementById("procedural-overlay");
+
+  if (!closeButton || !sidebar || !overlay) return;
+  
+  proceduralSidebarInitialized = true;
+
+  // Fecha sidebar
+  closeButton.addEventListener("click", () => {
+    sidebar.classList.add("translate-x-full");
+    overlay.classList.add("hidden");
+  });
+
+  // Fecha ao clicar no overlay
+  overlay.addEventListener("click", () => {
+    sidebar.classList.add("translate-x-full");
+    overlay.classList.add("hidden");
+  });
+
+  // Fecha com ESC
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !sidebar.classList.contains("translate-x-full")) {
+      sidebar.classList.add("translate-x-full");
+      overlay.classList.add("hidden");
+    }
+  });
+}
+
+/**
  * Inicializa sistema procedural
  */
 function initializeProcedural() {
   loadProcedural();
+  initializeProceduralSidebar();
   
   // Gera máquinas para todas as tiers até a atual
   for (let tier = 1; tier <= proceduralState.progressionTier; tier++) {
@@ -113,14 +150,18 @@ function initializeProcedural() {
   }
   
   saveProcedural();
-  renderProceduralUI();
+  
+  // Renderiza UI se o container existir
+  if (document.getElementById("procedural-sidebar-content")) {
+    renderProceduralUI();
+  }
 }
 
 /**
  * Renderiza UI procedural
  */
 function renderProceduralUI() {
-  const container = document.getElementById("procedural-container");
+  const container = document.getElementById("procedural-sidebar-content");
   if (!container) return;
   
   // Renderiza máquinas da tier atual
@@ -132,17 +173,16 @@ function renderProceduralUI() {
     const canAfford = gameState.coins >= cost;
     
     machinesHtml += `
-      <div class="bg-dark-card p-4 rounded-lg flex items-center justify-between border border-gray-700 hover:border-${machine.color.replace('#', '')}" style="border-color: ${machine.color};">
-        <div class="flex items-center space-x-3">
-          <span class="text-4xl">${machine.icon}</span>
-          <div>
-            <p class="font-bold text-white">${machine.name}</p>
-            <p class="text-xs text-gray-400">${machine.description}</p>
-            <p class="text-xs text-gray-500">Tier ${machine.tier} • Nível ${machine.level}</p>
+      <div class="bg-blue-800/20 rounded-lg p-3 flex items-center justify-between border border-blue-700 hover:border-blue-500 transition">
+        <div class="flex items-center space-x-2 flex-1">
+          <span class="text-3xl">${machine.icon}</span>
+          <div class="flex-1">
+            <p class="font-bold text-white text-sm">${machine.name}</p>
+            <p class="text-xs text-gray-400">Nível ${machine.level}</p>
           </div>
         </div>
         <button
-          class="buy-machine-button bg-primary hover:bg-yellow-400 text-dark-bg font-bold py-2 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+          class="buy-machine-button bg-primary hover:bg-yellow-400 text-dark-bg font-bold py-1.5 px-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-xs whitespace-nowrap"
           data-machine-id="${machine.id}"
           ${!canAfford ? "disabled" : ""}
         >
@@ -156,37 +196,48 @@ function renderProceduralUI() {
   const canUnlockTier = gameState.coins >= nextTierCost;
   
   container.innerHTML = `
-    <div class="bg-dark-card p-6 rounded-xl shadow-2xl">
-      <h2 class="text-2xl font-bold mb-4 text-primary border-b border-primary/50 pb-2 flex items-center space-x-2">
-        <span>♾️</span>
-        <span>Sistema Procedural (Tier ${proceduralState.progressionTier})</span>
-      </h2>
-      
-      <div class="bg-blue-900/20 border border-blue-600 rounded-lg p-4 mb-4">
-        <p class="text-sm text-gray-300">
-          Este sistema gera conteúdo infinito! Quanto mais você progride, mais máquinas poderosas são desbloqueadas.
-        </p>
-      </div>
-      
-      <div class="bg-purple-900/20 border border-purple-600 rounded-lg p-4 mb-4 flex items-center justify-between">
-        <div>
-          <p class="text-sm font-bold text-white">Desbloquear Próxima Tier</p>
-          <p class="text-xs text-gray-400">Custo: ${formatNumber(nextTierCost)} moedas</p>
+    <div class="space-y-4">
+      <!-- Card de Evolução -->
+      <div class="bg-gradient-to-br from-blue-900 to-cyan-900 rounded-xl p-4 border-2 border-blue-600">
+        <div class="mb-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-blue-300 font-semibold">Nível Atual</span>
+            <span class="text-xl font-bold text-blue-200">${proceduralState.progressionTier}</span>
+          </div>
         </div>
-        <button
-          id="unlock-tier-button"
-          class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-          ${!canUnlockTier ? "disabled" : ""}
-        >
-          Desbloquear Tier ${proceduralState.progressionTier + 1}
-        </button>
+        
+        <div class="bg-blue-800/30 rounded-lg p-3 mb-3">
+          <p class="text-xs text-gray-300">
+            <strong>⚡ Motor Infinito!</strong> Quanto mais você investe, mais poderosas as máquinas quânticas se tornam.
+          </p>
+        </div>
+        
+        <div class="bg-purple-900/20 border border-purple-600 rounded-lg p-3 mb-3">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-sm font-bold text-white">🔥 Evolução Quântica</p>
+              <p class="text-xs text-gray-400">Custo: ${formatNumber(nextTierCost)} moedas</p>
+            </div>
+          </div>
+          <button
+            id="unlock-tier-button"
+            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            ${!canUnlockTier ? "disabled" : ""}
+          >
+            Evoluir para Nível ${proceduralState.progressionTier + 1}
+          </button>
+        </div>
       </div>
       
-      <h3 class="text-xl font-bold text-purple-300 mb-3 mt-6 border-b border-gray-700 pb-2">
-        Máquinas da Tier ${proceduralState.progressionTier}
-      </h3>
-      <div class="space-y-3">
-        ${machinesHtml}
+      <!-- Máquinas -->
+      <div class="bg-blue-800/20 rounded-lg p-4 border border-blue-700">
+        <h3 class="text-lg font-bold text-blue-200 mb-3 flex items-center space-x-2">
+          <span>🛠️</span>
+          <span>Máquinas Quânticas Nível ${proceduralState.progressionTier}</span>
+        </h3>
+        <div class="space-y-2">
+          ${machinesHtml}
+        </div>
       </div>
     </div>
   `;

@@ -17,6 +17,8 @@ let prestigeState = {
     autoPower: 1,             // Multiplicador de produção automática
     criticalChance: 1,        // Multiplicador de chance crítica
     allEarnings: 1,           // Multiplicador geral de ganhos
+    coinBonus: 1,             // Bônus de moedas por clique
+    multiplierBonus: 1,       // Bônus de multiplicador geral
   }
 };
 
@@ -37,6 +39,14 @@ const PRESTIGE_COST_MULTIPLIERS = {
   allEarnings: {
     baseCost: 50,
     costMultiplier: 5,       // O mais poderoso, mais caro
+  },
+  coinBonus: {
+    baseCost: 25,
+    costMultiplier: 4,       // Bônus de moedas por clique
+  },
+  multiplierBonus: {
+    baseCost: 40,
+    costMultiplier: 5,       // Bônus de multiplicador geral
   }
 };
 
@@ -46,6 +56,8 @@ let prestigeUpgradeLevels = {
   autoPower: 0,
   criticalChance: 0,
   allEarnings: 0,
+  coinBonus: 0,
+  multiplierBonus: 0,
 };
 
 /**
@@ -182,6 +194,9 @@ function updatePrestigeMultipliers() {
   prestigeState.multipliers.autoPower = 1 + (prestigeUpgradeLevels.autoPower * 0.1);
   prestigeState.multipliers.criticalChance = 1 + (prestigeUpgradeLevels.criticalChance * 0.05);
   prestigeState.multipliers.allEarnings = 1 + (prestigeUpgradeLevels.allEarnings * 0.15);
+  // Novos multiplicadores
+  prestigeState.multipliers.coinBonus = 1 + (prestigeUpgradeLevels.coinBonus * 0.2);
+  prestigeState.multipliers.multiplierBonus = 1 + (prestigeUpgradeLevels.multiplierBonus * 0.3);
 }
 
 /**
@@ -214,7 +229,7 @@ function getPrestigeMultiplier(type) {
  * Renderiza a UI de prestígio
  */
 function renderPrestigeUI() {
-  const container = document.getElementById("prestige-container");
+  const container = document.getElementById("prestige-sidebar-content");
   if (!container) return;
 
   const canDoPrestige = canPrestige();
@@ -222,69 +237,74 @@ function renderPrestigeUI() {
   const totalMultiplier = Object.values(prestigeState.multipliers).reduce((a, b) => a * b, 1);
 
   container.innerHTML = `
-    <div class="bg-gradient-to-br from-purple-900 to-indigo-900 rounded-xl p-6 border-2 border-purple-600">
-      <h2 class="text-2xl font-bold text-purple-200 mb-4 flex items-center space-x-2">
-        <span>⭐</span>
-        <span>Ascensão (Prestígio)</span>
-        <span class="text-sm font-normal text-purple-400 ml-2">
-          Nível ${prestigeState.level}
-        </span>
-      </h2>
-
-      <div class="grid md:grid-cols-2 gap-4 mb-4">
-        <!-- Card de Prestígio -->
-        <div class="bg-purple-800/30 rounded-lg p-4 border border-purple-600">
-          <h3 class="text-lg font-bold text-purple-200 mb-2">🔄 Fazer Ascensão</h3>
-          <p class="text-sm text-gray-300 mb-3">
-            Reset seu progresso em troca de bônus permanentes
-          </p>
-          
-          <div class="mb-3">
-            <div class="text-xs text-gray-400 mb-1">Requerido: 1.00M moedas</div>
-            <div class="text-sm text-purple-200 font-bold">
-              Ganhará: ${reward.toFixed(1)} pontos de prestígio
-            </div>
+    <div class="space-y-4">
+      <!-- Card de Prestígio -->
+      <div class="bg-gradient-to-br from-purple-900 to-indigo-900 rounded-xl p-4 border-2 border-purple-600">
+        <div class="mb-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-purple-300 font-semibold">Nível de Ascensão</span>
+            <span class="text-xl font-bold text-purple-200">${prestigeState.level}</span>
           </div>
-
-          <button
-            id="prestige-button"
-            class="w-full py-2 px-4 rounded-lg font-bold transition ${canDoPrestige 
-              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white' 
-              : 'bg-gray-700 text-gray-500 cursor-not-allowed'}"
-            ${!canDoPrestige ? 'disabled' : ''}
-          >
-            ${canDoPrestige ? '⭐ Ascender Agora' : '⏳ Complete 1.00M moedas'}
-          </button>
+        </div>
+        
+        <h3 class="text-lg font-bold text-purple-200 mb-2 flex items-center space-x-2">
+          <span>⭐</span>
+          <span>Fazer Ascensão</span>
+        </h3>
+        <p class="text-xs text-gray-300 mb-3">
+          Reset seu progresso em troca de bônus permanentes
+        </p>
+        
+        <div class="mb-3 bg-purple-800/30 rounded-lg p-3">
+          <div class="text-xs text-gray-400 mb-1">Requerido: 1.00M moedas</div>
+          <div class="text-lg text-purple-200 font-bold">
+            Ganhará: ${reward.toFixed(1)} pontos
+          </div>
         </div>
 
-        <!-- Status -->
-        <div class="bg-purple-800/30 rounded-lg p-4 border border-purple-600">
-          <h3 class="text-lg font-bold text-purple-200 mb-2">📊 Status</h3>
-          <div class="space-y-2 text-sm">
-            <div class="flex justify-between">
-              <span class="text-gray-300">Pontos Disponíveis:</span>
-              <span class="text-purple-200 font-bold">${prestigeState.prestigePoints.toFixed(1)}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-300">Total Ascensões:</span>
-              <span class="text-purple-200 font-bold">${prestigeState.totalPrestiges}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-300">Multiplicador Total:</span>
-              <span class="text-green-300 font-bold">${totalMultiplier.toFixed(2)}x</span>
-            </div>
+        <button
+          id="prestige-button"
+          class="w-full py-3 px-4 rounded-lg font-bold transition ${canDoPrestige 
+            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white' 
+            : 'bg-gray-700 text-gray-500 cursor-not-allowed'}"
+          ${!canDoPrestige ? 'disabled' : ''}
+        >
+          ${canDoPrestige ? '⭐ Ascender Agora' : '⏳ Complete 1.00M moedas'}
+        </button>
+      </div>
+
+      <!-- Status -->
+      <div class="bg-purple-800/30 rounded-lg p-4 border border-purple-600">
+        <h3 class="text-lg font-bold text-purple-200 mb-3">📊 Seus Estatísticas</h3>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300 text-sm">Pontos Disponíveis:</span>
+            <span class="text-purple-200 font-bold text-lg">${prestigeState.prestigePoints.toFixed(1)}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300 text-sm">Total Ascensões:</span>
+            <span class="text-purple-200 font-bold text-lg">${prestigeState.totalPrestiges}</span>
+          </div>
+          <div class="flex justify-between items-center border-t border-purple-700 pt-2 mt-2">
+            <span class="text-gray-300 text-sm font-semibold">Multiplicador Total:</span>
+            <span class="text-green-300 font-bold text-xl">${totalMultiplier.toFixed(2)}x</span>
           </div>
         </div>
       </div>
 
       <!-- Upgrades de Prestígio -->
-      <div class="mt-4">
-        <h3 class="text-lg font-bold text-purple-200 mb-3">🎯 Melhorias Permanentes</h3>
-        <div class="grid md:grid-cols-2 gap-3">
+      <div class="bg-purple-800/20 rounded-lg p-4 border border-purple-700">
+        <h3 class="text-lg font-bold text-purple-200 mb-3 flex items-center space-x-2">
+          <span>🎯</span>
+          <span>Melhorias Permanentes</span>
+        </h3>
+        <div class="space-y-2">
           ${renderPrestigeUpgrade("clickPower", "💪", "Força de Clique", "+10% por nível")}
           ${renderPrestigeUpgrade("autoPower", "⚡", "Auto-Produção", "+10% por nível")}
           ${renderPrestigeUpgrade("criticalChance", "🎲", "Chance Crítica", "+5% por nível")}
           ${renderPrestigeUpgrade("allEarnings", "💰", "Todos Ganhos", "+15% por nível")}
+          ${renderPrestigeUpgrade("coinBonus", "🪙", "Bônus de Moedas", "+20% por nível")}
+          ${renderPrestigeUpgrade("multiplierBonus", "🔥", "Multiplicador Total", "+30% por nível")}
         </div>
       </div>
     </div>
@@ -392,27 +412,57 @@ function handleBuyPrestigeUpgrade(type) {
 }
 
 /**
+ * Inicializa a sidebar de prestígio
+ */
+let prestigeSidebarInitialized = false;
+function initializePrestigeSidebar() {
+  if (prestigeSidebarInitialized) return;
+  
+  const closeButton = document.getElementById("close-prestige");
+  const sidebar = document.getElementById("prestige-sidebar");
+  const overlay = document.getElementById("prestige-overlay");
+
+  if (!closeButton || !sidebar || !overlay) return;
+  
+  prestigeSidebarInitialized = true;
+
+  // Fecha sidebar
+  closeButton.addEventListener("click", () => {
+    sidebar.classList.add("translate-x-full");
+    overlay.classList.add("hidden");
+  });
+
+  // Fecha ao clicar no overlay
+  overlay.addEventListener("click", () => {
+    sidebar.classList.add("translate-x-full");
+    overlay.classList.add("hidden");
+  });
+
+  // Fecha com ESC
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !sidebar.classList.contains("translate-x-full")) {
+      sidebar.classList.add("translate-x-full");
+      overlay.classList.add("hidden");
+    }
+  });
+}
+
+/**
  * Inicializa o sistema de prestígio
  */
 function initializePrestige() {
   loadPrestige();
   updatePrestigeMultipliers();
+  initializePrestigeSidebar();
   
   // Renderiza UI se o container existir
-  if (document.getElementById("prestige-container")) {
+  if (document.getElementById("prestige-sidebar-content")) {
     renderPrestigeUI();
   }
 }
 
-// Inicializa quando carrega
-if (typeof window !== "undefined") {
-  window.addEventListener("DOMContentLoaded", () => {
-    // Aguarda um pouco para garantir que outros sistemas inicializaram
-    setTimeout(() => {
-      initializePrestige();
-    }, 500);
-  });
-}
+// Inicialização principal é feita pelo game.js via startGame()
+// Não precisa inicializar aqui para evitar duplicação de listeners
 
 // Exporta funções globais
 if (typeof window !== "undefined") {

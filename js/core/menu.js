@@ -368,3 +368,190 @@ function showConfirmNewGameModal() {
   document.addEventListener("keydown", handleEscKey, { once: true });
 }
 
+/**
+ * Inicializa o menu de navegação do jogo (sidebar lateral)
+ */
+function initializeGameMenu() {
+  const menuButton = document.getElementById("menu-button");
+  const closeMenuButton = document.getElementById("close-main-menu");
+  const menuSidebar = document.getElementById("main-menu-sidebar");
+  const menuOverlay = document.getElementById("main-menu-overlay-close");
+
+  if (!menuButton || !closeMenuButton || !menuSidebar || !menuOverlay) return;
+
+  // Botões do menu que abrem outras sidebars
+  const leaderboardButton = document.getElementById("menu-leaderboard-button");
+  const myIdButton = document.getElementById("menu-my-id-button");
+  const prestigeButton = document.getElementById("menu-prestige-button");
+  const proceduralButton = document.getElementById("menu-procedural-button");
+
+  // Abre menu principal
+  menuButton.addEventListener("click", () => {
+    updateMenuPlayerInfo();
+    menuSidebar.classList.remove("-translate-x-full");
+    menuOverlay.classList.remove("hidden");
+  });
+
+  // Fecha menu principal
+  closeMenuButton.addEventListener("click", () => {
+    menuSidebar.classList.add("-translate-x-full");
+    menuOverlay.classList.add("hidden");
+  });
+
+  // Fecha ao clicar no overlay
+  menuOverlay.addEventListener("click", () => {
+    menuSidebar.classList.add("-translate-x-full");
+    menuOverlay.classList.add("hidden");
+  });
+
+  // Fecha com ESC
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !menuSidebar.classList.contains("-translate-x-full")) {
+      menuSidebar.classList.add("-translate-x-full");
+      menuOverlay.classList.add("hidden");
+    }
+  });
+
+  // Abre Ranking
+  if (leaderboardButton) {
+    leaderboardButton.addEventListener("click", async () => {
+      menuSidebar.classList.add("-translate-x-full");
+      menuOverlay.classList.add("hidden");
+      
+      // Abre o sidebar de ranking diretamente
+      const rankSidebar = document.getElementById("leaderboard-sidebar");
+      const rankOverlay = document.getElementById("leaderboard-overlay");
+      
+      if (rankSidebar && rankOverlay) {
+        // Mostra loading
+        const loadingElement = document.getElementById("loading-leaderboard");
+        if (loadingElement) {
+          loadingElement.classList.remove("hidden");
+        }
+        
+        try {
+          // Atualiza o score antes de abrir o ranking
+          if (typeof submitScore === "function" && typeof gameState !== "undefined") {
+            await submitScore(gameState.coins, gameState.coins);
+          }
+          // Carrega o ranking quando abrir
+          if (typeof loadLeaderboard === "function") {
+            await loadLeaderboard();
+          }
+        } finally {
+          // Esconde loading
+          if (loadingElement) {
+            loadingElement.classList.add("hidden");
+          }
+        }
+        
+        rankSidebar.classList.remove("translate-x-full");
+        rankOverlay.classList.remove("hidden");
+      }
+    });
+  }
+
+  // Abre Meu ID / Cloud Save
+  if (myIdButton) {
+    myIdButton.addEventListener("click", () => {
+      menuSidebar.classList.add("-translate-x-full");
+      menuOverlay.classList.add("hidden");
+      
+      // Abre o modal de ID diretamente
+      const modal = document.getElementById("player-id-modal");
+      const playerIdDisplay = document.getElementById("player-id-display");
+      const playerNameDisplay = document.getElementById("cloud-save-player-name");
+      
+      if (modal) {
+        // Atualiza o nome do jogador
+        if (playerNameDisplay) {
+          const playerName = localStorage.getItem("coinClickerPlayerName") || "Minerador";
+          playerNameDisplay.textContent = playerName;
+        }
+        
+        // Atualiza o ID exibido
+        if (playerIdDisplay) {
+          if (typeof getCurrentPlayerIdForCloud === "function") {
+            const currentId = getCurrentPlayerIdForCloud();
+            if (currentId) {
+              playerIdDisplay.value = currentId;
+            } else {
+              playerIdDisplay.value = "Sem ID";
+            }
+          }
+        }
+        
+        modal.classList.remove("hidden");
+      }
+    });
+  }
+
+  // Abre Ascensão
+  if (prestigeButton) {
+    prestigeButton.addEventListener("click", () => {
+      menuSidebar.classList.add("-translate-x-full");
+      menuOverlay.classList.add("hidden");
+      
+      // Abre o sidebar de prestígio diretamente
+      const prestigeSidebar = document.getElementById("prestige-sidebar");
+      const prestigeOverlay = document.getElementById("prestige-overlay");
+      
+      if (prestigeSidebar && prestigeOverlay) {
+        if (typeof renderPrestigeUI === "function") {
+          renderPrestigeUI();
+        }
+        prestigeSidebar.classList.remove("translate-x-full");
+        prestigeOverlay.classList.remove("hidden");
+      }
+    });
+  }
+
+  // Abre Motor Quântico
+  if (proceduralButton) {
+    proceduralButton.addEventListener("click", () => {
+      menuSidebar.classList.add("-translate-x-full");
+      menuOverlay.classList.add("hidden");
+      
+      // Abre o sidebar de procedural diretamente
+      const proceduralSidebar = document.getElementById("procedural-sidebar");
+      const proceduralOverlay = document.getElementById("procedural-overlay");
+      
+      if (proceduralSidebar && proceduralOverlay) {
+        if (typeof renderProceduralUI === "function") {
+          renderProceduralUI();
+        }
+        proceduralSidebar.classList.remove("translate-x-full");
+        proceduralOverlay.classList.remove("hidden");
+      }
+    });
+  }
+}
+
+/**
+ * Atualiza informações do jogador no menu
+ */
+function updateMenuPlayerInfo() {
+  const playerNameEl = document.getElementById("menu-player-name");
+  const playerLevelEl = document.getElementById("menu-player-level");
+  
+  if (!playerNameEl || !playerLevelEl) return;
+
+  // Nome do jogador
+  const playerName = localStorage.getItem("coinClickerPlayerName") || "Minerador";
+  playerNameEl.textContent = playerName;
+
+  // Nível de ascensão
+  try {
+    const prestigeData = localStorage.getItem("coinClickerPrestige");
+    if (prestigeData) {
+      const data = JSON.parse(prestigeData);
+      const level = data.state?.level || 0;
+      playerLevelEl.textContent = `Nível de Ascensão: ${level}`;
+    } else {
+      playerLevelEl.textContent = "Nível de Ascensão: 0";
+    }
+  } catch (e) {
+    playerLevelEl.textContent = "Nível de Ascensão: 0";
+  }
+}
+

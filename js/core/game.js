@@ -438,9 +438,11 @@ function calculateTotalCPS() {
     totalCPS *= getInventoryCPSMultiplier();
   }
 
-  // Aplica multiplicador de prestígio
+  // Aplica multiplicadores de prestígio
   if (typeof getPrestigeMultiplier === "function") {
     totalCPS *= getPrestigeMultiplier("autoPower");
+    totalCPS *= getPrestigeMultiplier("allEarnings");
+    totalCPS *= getPrestigeMultiplier("multiplierBonus");
   }
 
   // Aplica multiplicador procedural
@@ -467,9 +469,11 @@ function calculateTotalCPC() {
     totalCPC *= getInventoryCPCMultiplier();
   }
 
-  // Aplica multiplicador de prestígio
+  // Aplica multiplicadores de prestígio
   if (typeof getPrestigeMultiplier === "function") {
     totalCPC *= getPrestigeMultiplier("clickPower");
+    totalCPC *= getPrestigeMultiplier("allEarnings");
+    totalCPC *= getPrestigeMultiplier("multiplierBonus");
   }
 
   return totalCPC;
@@ -720,6 +724,13 @@ function clickCoin() {
   // Aplica buffs do inventário
   if (typeof getInventoryCPCMultiplier === "function") {
     earnedAmount *= getInventoryCPCMultiplier();
+  }
+
+  // Aplica multiplicadores de prestígio (coinBonus e allEarnings)
+  if (typeof getPrestigeMultiplier === "function") {
+    earnedAmount *= getPrestigeMultiplier("coinBonus");
+    earnedAmount *= getPrestigeMultiplier("allEarnings");
+    earnedAmount *= getPrestigeMultiplier("multiplierBonus");
   }
 
   // Calcula chance crítica com buffs do inventário e prestígio
@@ -1149,6 +1160,11 @@ function startGame(loadSave = true) {
     initializeProcedural();
   }
 
+  // Inicializa menu de navegação
+  if (typeof initializeGameMenu === "function") {
+    initializeGameMenu();
+  }
+
   // Se for novo jogo, reseta o estado
   if (!loadSave) {
     gameState = {
@@ -1207,7 +1223,7 @@ function startGame(loadSave = true) {
 
   // Inicia o loop de salvamento
   if (!saveInterval) {
-    saveInterval = setInterval(saveGame, 5000); // Salva a cada 5 segundos
+    saveInterval = setInterval(saveGame, 60000); // Salva a cada 60 segundos
   }
 
   // Adiciona listener do botão principal
