@@ -11,6 +11,9 @@ const CLOUD_SAVE_API_URL = `https://api.jsonbin.io/v3/b/${CLOUD_SAVE_BIN_ID}`;
 // Cache para evitar muitas requisições
 let lastCloudSaveLoad = 0;
 const CLOUD_SAVE_CACHE_TIME = 5000; // 5 segundos
+let cachedBinData = null; // Cache local dos dados do bin
+let lastBinFetch = 0;
+const BIN_CACHE_TIME = 10000; // Cache do bin por 10 segundos
 
 /**
  * Salva o jogo na nuvem vinculado ao ID do jogador
@@ -23,12 +26,22 @@ async function saveGameToCloud(gameData) {
       return false;
     }
 
-    // Carrega dados completos do bin
-    const currentData = await fetch(CLOUD_SAVE_API_URL + "/latest", {
-      headers: { "X-Master-Key": CLOUD_SAVE_API_KEY },
-    }).then(r => r.json()).catch(() => ({}));
+    // Usa cache se disponível e recente, senão busca do servidor
+    let savePayload = {};
+    const now = Date.now();
+    
+    if (cachedBinData && (now - lastBinFetch) < BIN_CACHE_TIME) {
+      savePayload = cachedBinData;
+    } else {
+      // Carrega dados completos do bin
+      const currentData = await fetch(CLOUD_SAVE_API_URL + "/latest", {
+        headers: { "X-Master-Key": CLOUD_SAVE_API_KEY },
+      }).then(r => r.json()).catch(() => ({}));
 
-    const savePayload = currentData.record || {};
+      savePayload = currentData.record || {};
+      cachedBinData = savePayload;
+      lastBinFetch = now;
+    }
     
     // Garante que cloudSaves existe
     if (!savePayload.cloudSaves) {
@@ -40,8 +53,6 @@ async function saveGameToCloud(gameData) {
       gameData: gameData,
       timestamp: Date.now()
     };
-
-    console.log("💾 Salvando jogo na nuvem com ID:", playerId);
 
     // Preserva outros campos (leaderboard, auth)
     const response = await fetch(CLOUD_SAVE_API_URL, {
@@ -56,6 +67,9 @@ async function saveGameToCloud(gameData) {
     if (response.ok) {
       console.log("✅ Jogo salvo na nuvem com sucesso!");
       lastCloudSaveLoad = Date.now();
+      // Atualiza cache com os dados salvos
+      cachedBinData = savePayload;
+      lastBinFetch = Date.now();
       return true;
     } else {
       console.error("Erro ao salvar na nuvem:", response.status, response.statusText);
@@ -94,15 +108,10 @@ async function loadGameFromCloud() {
       const data = await response.json();
       const cloudSaves = data.record.cloudSaves || {};
       
-      console.log("🔍 Procurando ID:", playerId);
-      console.log("📦 IDs disponíveis na nuvem:", Object.keys(cloudSaves));
-      
       if (cloudSaves[playerId]) {
-        console.log("✅ Jogo carregado da nuvem com sucesso!");
         lastCloudSaveLoad = now;
         return cloudSaves[playerId].gameData;
       } else {
-        console.log("❌ Nenhum save encontrado na nuvem para este ID");
         return null;
       }
     } else {
@@ -119,26 +128,19 @@ async function loadGameFromCloud() {
  * Obtém o ID atual do jogador (usuário autenticado ou ID gerado)
  */
 function getCurrentPlayerIdForCloud() {
-  console.log("🔍 Buscando ID do jogador...");
-  
   // Tenta usar ID de usuário autenticado primeiro
   if (typeof getCurrentUser === "function" && getCurrentUser()) {
     const user = getCurrentUser();
-    console.log("✅ Usando ID de usuário autenticado:", user.id);
     return user.id;
   }
   
   // Fallback para ID único gerado
   if (typeof getOrCreatePlayerId === "function") {
-    const id = getOrCreatePlayerId();
-    console.log("✅ Usando ID gerado:", id);
-    return id;
+    return getOrCreatePlayerId();
   }
   
   // Última tentativa: localStorage
-  const id = localStorage.getItem("playerUniqueId");
-  console.log("✅ Usando ID do localStorage:", id);
-  return id;
+  return localStorage.getItem("playerUniqueId");
 }
 
 /**

@@ -32,6 +32,10 @@ let gameState = {
 let gameInterval = null;
 let saveInterval = null;
 let lastUpdateTime = Date.now();
+let lastScoreSubmission = 0;
+let lastCloudSave = 0;
+const SCORE_SUBMIT_INTERVAL = 60000; // Submete score a cada 1 minuto
+const CLOUD_SAVE_INTERVAL = 30000; // Salva na nuvem a cada 30 segundos
 
 // --- Funções de Persistência (localStorage) ---
 
@@ -55,14 +59,20 @@ function saveGame() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(saveObject));
     console.log("Jogo salvo com sucesso.");
     
-    // Submete pontuação ao ranking online
-    if (typeof submitScore === "function") {
-      submitScore(gameState.coins, gameState.coins);
-    }
+    // NÃO submete score automaticamente - apenas quando abrir o ranking
+    // if (typeof submitScore === "function") {
+    //   if (now - lastScoreSubmission >= SCORE_SUBMIT_INTERVAL) {
+    //     submitScore(gameState.coins, gameState.coins);
+    //     lastScoreSubmission = now;
+    //   }
+    // }
     
-    // Salva na nuvem também
+    // Salva na nuvem também (apenas se passou o intervalo)
     if (typeof saveGameToCloud === "function") {
-      saveGameToCloud(saveObject);
+      if (now - lastCloudSave >= CLOUD_SAVE_INTERVAL) {
+        saveGameToCloud(saveObject);
+        lastCloudSave = now;
+      }
     }
   } catch (e) {
     console.error("Erro ao salvar o jogo:", e);
@@ -481,7 +491,17 @@ function calculateTotalCPS() {
     totalCPS *= getInventoryCPSMultiplier();
   }
 
-  return Math.round(totalCPS);
+  // Aplica multiplicador de prestígio
+  if (typeof getPrestigeMultiplier === "function") {
+    totalCPS *= getPrestigeMultiplier("autoPower");
+  }
+
+  // Aplica multiplicador procedural
+  if (typeof getProceduralCPSMultiplier === "function") {
+    totalCPS *= getProceduralCPSMultiplier();
+  }
+
+  return totalCPS;
 }
 
 function calculateTotalCPC() {
@@ -500,7 +520,12 @@ function calculateTotalCPC() {
     totalCPC *= getInventoryCPCMultiplier();
   }
 
-  return Math.round(totalCPC);
+  // Aplica multiplicador de prestígio
+  if (typeof getPrestigeMultiplier === "function") {
+    totalCPC *= getPrestigeMultiplier("clickPower");
+  }
+
+  return totalCPC;
 }
 
 // --- Funções de Áudio ---
@@ -750,10 +775,14 @@ function clickCoin() {
     earnedAmount *= getInventoryCPCMultiplier();
   }
 
-  // Calcula chance crítica com buffs do inventário
+  // Calcula chance crítica com buffs do inventário e prestígio
   let criticalChance = gameState.criticalChance;
   if (typeof getInventoryCriticalChance === "function") {
     criticalChance += getInventoryCriticalChance();
+  }
+  // Aplica multiplicador de prestígio em chance crítica
+  if (typeof getPrestigeMultiplier === "function") {
+    criticalChance *= getPrestigeMultiplier("criticalChance");
   }
 
   if (Math.random() < criticalChance) {
@@ -1191,9 +1220,14 @@ function startGame(loadSave = true) {
     initializeInventory();
   }
 
-  // Inicializa estatísticas
-  if (typeof initializeStats === "function") {
-    initializeStats();
+  // Inicializa prestígio
+  if (typeof initializePrestige === "function") {
+    initializePrestige();
+  }
+
+  // Inicializa sistema procedural
+  if (typeof initializeProcedural === "function") {
+    initializeProcedural();
   }
 
   // Se for novo jogo, reseta o estado

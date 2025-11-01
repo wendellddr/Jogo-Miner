@@ -1065,3 +1065,19 @@ body {
   animation: mine-swing 0.6s ease-in-out infinite;
   transform-origin: bottom center;
 }
+
+/* Animação de fade-in suave */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}

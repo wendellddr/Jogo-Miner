@@ -58,22 +58,10 @@ function initializeMainMenu() {
   newGameButton.addEventListener("click", () => {
     // Confirma se o usuário realmente quer começar um novo jogo
     if (hasSaveGame()) {
-      if (
-        !confirm(
-          "Você tem um progresso salvo. Deseja realmente começar um novo jogo? Todo o progresso será perdido."
-        )
-      ) {
-        return; // Cancela se o usuário não confirmar
-      }
-    }
-    // Limpa o save
-    localStorage.removeItem("coinClickerSave");
-    hideMainMenu();
-    // startGame será definido em game.js
-    if (typeof startGame === "function") {
-      startGame(false); // false = novo jogo
+      showConfirmNewGameModal();
     } else {
-      console.error("game.js não foi carregado! startGame não está disponível.");
+      // Não há save, vai direto para o modal de nome
+      showPlayerNameModal();
     }
   });
 
@@ -233,4 +221,150 @@ window.addEventListener("load", function () {
     }
   }
 });
+
+/**
+ * Mostra o modal bonito para pedir o nome do jogador
+ */
+function showPlayerNameModal() {
+  const modal = document.getElementById("player-name-modal");
+  const nameInput = document.getElementById("player-name-input");
+  const confirmButton = document.getElementById("confirm-name-button");
+  const cancelButton = document.getElementById("cancel-name-button");
+  
+  if (!modal || !nameInput || !confirmButton || !cancelButton) {
+    console.error("Elementos do modal de nome não encontrados!");
+    return;
+  }
+  
+  // Mostra o modal
+  modal.classList.remove("hidden");
+  // Foca no input
+  setTimeout(() => nameInput.focus(), 100);
+  
+  // Limpa o input
+  nameInput.value = "";
+  
+  // Handler para confirmar
+  const handleConfirm = () => {
+    const playerName = nameInput.value.trim();
+    
+    if (!playerName) {
+      alert("Por favor, digite seu nome!");
+      nameInput.focus();
+      return;
+    }
+    
+    // Esconde o modal
+    modal.classList.add("hidden");
+    
+    // Salva o nome do jogador
+    if (typeof setPlayerName === "function") {
+      setPlayerName(playerName);
+    } else {
+      localStorage.setItem("playerName", playerName.substring(0, 20));
+    }
+    
+    // Limpa TODOS os dados do jogo do localStorage
+    localStorage.removeItem("coinClickerSave");
+    localStorage.removeItem("coinClickerWorlds");
+    localStorage.removeItem("coinClickerAchievements");
+    localStorage.removeItem("coinClickerInventory");
+    localStorage.removeItem("coinClickerPrestige");
+    
+    hideMainMenu();
+    
+    // startGame será definido em game.js
+    if (typeof startGame === "function") {
+      startGame(false); // false = novo jogo
+    } else {
+      console.error("game.js não foi carregado! startGame não está disponível.");
+    }
+  };
+  
+  // Handler para cancelar
+  const handleCancel = () => {
+    // Esconde o modal
+    modal.classList.add("hidden");
+  };
+  
+  // Handler para clicar fora do modal
+  const handleModalClick = (e) => {
+    if (e.target === modal) {
+      handleCancel();
+    }
+  };
+  
+  // Handler para Enter
+  const handleEnterKey = (e) => {
+    if (e.key === "Enter") {
+      handleConfirm();
+    } else if (e.key === "Escape") {
+      handleCancel();
+    }
+  };
+  
+  // Adiciona listeners
+  confirmButton.addEventListener("click", handleConfirm, { once: true });
+  cancelButton.addEventListener("click", handleCancel, { once: true });
+  modal.addEventListener("click", handleModalClick, { once: true });
+  nameInput.addEventListener("keydown", handleEnterKey, { once: true });
+  document.addEventListener("keydown", handleEnterKey, { once: true });
+}
+
+// Exporta função globalmente
+if (typeof window !== "undefined") {
+  window.showPlayerNameModal = showPlayerNameModal;
+}
+
+/**
+ * Mostra o modal de confirmação para começar um novo jogo (quando há save)
+ */
+function showConfirmNewGameModal() {
+  const modal = document.getElementById("confirm-new-game-modal");
+  const confirmButton = document.getElementById("confirm-new-game-button");
+  const cancelButton = document.getElementById("cancel-new-game-button");
+  
+  if (!modal || !confirmButton || !cancelButton) {
+    console.error("Elementos do modal de confirmação não encontrados!");
+    return;
+  }
+  
+  // Mostra o modal
+  modal.classList.remove("hidden");
+  
+  // Handler para confirmar
+  const handleConfirm = () => {
+    // Esconde o modal de confirmação
+    modal.classList.add("hidden");
+    
+    // Abre o modal de nome
+    showPlayerNameModal();
+  };
+  
+  // Handler para cancelar
+  const handleCancel = () => {
+    // Esconde o modal
+    modal.classList.add("hidden");
+  };
+  
+  // Handler para clicar fora do modal
+  const handleModalClick = (e) => {
+    if (e.target === modal) {
+      handleCancel();
+    }
+  };
+  
+  // Handler para ESC
+  const handleEscKey = (e) => {
+    if (e.key === "Escape") {
+      handleCancel();
+    }
+  };
+  
+  // Adiciona listeners com once: true (auto-remove após primeiro uso)
+  confirmButton.addEventListener("click", handleConfirm, { once: true });
+  cancelButton.addEventListener("click", handleCancel, { once: true });
+  modal.addEventListener("click", handleModalClick, { once: true });
+  document.addEventListener("keydown", handleEscKey, { once: true });
+}
 

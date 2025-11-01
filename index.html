@@ -123,6 +123,85 @@
     <!-- Caixa de Mensagens (para substituir alert/confirm) -->
     <div id="message-container" class="message-box"></div>
 
+    <!-- Modal de Confirmação de Novo Jogo -->
+    <div
+      id="confirm-new-game-modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[100]"
+    >
+      <div class="bg-gradient-to-br from-dark-card to-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 border-2 border-red-500/30 animate-fade-in">
+        <div class="text-center mb-6">
+          <div class="text-6xl mb-4 animate-pulse">⚠️</div>
+          <h2 class="text-3xl font-bold text-red-400 mb-2">Atenção!</h2>
+          <p class="text-gray-300 text-base">Você tem um progresso salvo.</p>
+          <p class="text-gray-400 text-sm mt-2">Deseja realmente começar um novo jogo?</p>
+          <div class="bg-red-900/20 border border-red-600 rounded-lg p-3 mt-4">
+            <p class="text-red-400 text-sm font-semibold">⚠️ Todo o progresso será perdido!</p>
+          </div>
+        </div>
+
+        <div class="flex space-x-3">
+          <button
+            id="cancel-new-game-button"
+            class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            id="confirm-new-game-button"
+            class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105"
+          >
+            Sim, Reiniciar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Nome do Jogador (para novo jogo) - FORA do game-content para funcionar sempre -->
+    <div
+      id="player-name-modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[100]"
+    >
+      <div class="bg-gradient-to-br from-dark-card to-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 border-2 border-primary/30 animate-fade-in">
+        <div class="text-center mb-6">
+          <div class="text-6xl mb-4 animate-bounce">⛏️</div>
+          <h2 class="text-3xl font-bold text-primary mb-2">Bem-vindo, Minerador!</h2>
+          <p class="text-gray-300 text-sm">Escolha seu nome para começar a mineração</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="player-name-input" class="block text-gray-300 text-sm font-semibold mb-2">
+              Seu Nome
+            </label>
+            <input
+              type="text"
+              id="player-name-input"
+              maxlength="20"
+              placeholder="Digite seu nome aqui..."
+              class="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border-2 border-gray-600 focus:border-primary focus:outline-none text-lg transition-colors"
+              autocomplete="off"
+            />
+            <p class="text-xs text-gray-500 mt-2">Máximo de 20 caracteres</p>
+          </div>
+
+          <div class="flex space-x-3 pt-2">
+            <button
+              id="cancel-name-button"
+              class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              id="confirm-name-button"
+              class="flex-1 bg-gradient-to-r from-primary to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 text-dark-bg font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              Começar!
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Conteúdo do Jogo (escondido inicialmente) -->
     <div id="game-content" class="game-content flex-col items-center w-full">
       <header class="text-center mb-4 pixel-header">
@@ -153,10 +232,10 @@
           <img
             src="assets/logo-minerador-moedas.png"
             alt="Minerador de Moedas"
-            class="max-w-[120px] sm:max-w-[150px] h-auto pixel-logo"
+            class="max-w-[100px] sm:max-w-[150px] h-auto"
             id="game-logo"
           />
-          <div class="w-[60px] sm:w-[100px]"></div>
+          <div class="w-[50px] sm:w-[80px]"></div> <!-- Spacer para alinhar -->
         </div>
 
         <!-- Barra de Progresso do Mundo -->
@@ -195,12 +274,10 @@
         </p>
       </header>
 
-      <main
-        class="w-full max-w-[1400px] grid grid-cols-1 lg:grid-cols-12 gap-3 pixel-grid"
-      >
-        <!-- Painel de Estatísticas e Clicker (Esquerda) -->
+      <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 px-2 sm:px-4">
+        <!-- Painel de Estatísticas e Clicker (menor) -->
         <section
-          class="lg:col-span-3 pixel-panel p-3 flex flex-col items-center"
+          class="lg:col-span-3 bg-dark-card p-3 sm:p-4 rounded-xl shadow-2xl flex flex-col items-center"
         >
           <div class="pixel-border w-full mb-3 p-3">
             <h2 class="text-lg font-bold mb-2 text-primary pixel-text">
@@ -290,16 +367,10 @@
           </div>
         </section>
 
-        <!-- Painel de Upgrades (Centro) -->
-        <section class="lg:col-span-6 pixel-panel p-4">
-          <div class="pixel-border-header mb-4 pb-2">
-            <h2 class="text-xl font-bold text-primary pixel-text-header">
-              ⬆️ UPGRADES
-            </h2>
-          </div>
-          <div
-            id="upgrades-container"
-            class="space-y-2 pixel-scroll max-h-[calc(100vh-180px)] overflow-y-auto"
+        <!-- Painel de Upgrades -->
+        <section class="lg:col-span-6 bg-dark-card p-3 sm:p-6 rounded-xl shadow-2xl">
+          <h2
+            class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-primary border-b border-primary/50 pb-2"
           >
             <!-- Upgrades serão inseridos aqui pelo JavaScript -->
           </div>
@@ -309,16 +380,14 @@
           </div>
         </section>
 
-        <!-- Painel de Conquistas (Direita) -->
-        <section class="lg:col-span-3 pixel-panel p-3">
-          <div class="pixel-border-header mb-3 pb-2">
-            <h2
-              class="text-lg font-bold text-primary pixel-text-header flex items-center space-x-2"
-            >
-              <span>🏆</span>
-              <span>Conquistas</span>
-            </h2>
-          </div>
+        <!-- Painel de Conquistas (Lateral Direita) -->
+        <section class="lg:col-span-3 bg-dark-card p-3 sm:p-4 rounded-xl shadow-2xl">
+          <h2
+            class="text-xl font-bold mb-4 text-primary flex items-center space-x-2"
+          >
+            <span>🏆</span>
+            <span>Conquistas</span>
+          </h2>
           <div
             id="achievements-container"
             class="space-y-2 max-h-[calc(100vh-180px)] overflow-y-auto pixel-scroll"
@@ -327,6 +396,20 @@
           </div>
         </section>
       </main>
+
+      <!-- Seção de Prestígio -->
+      <section class="w-full max-w-7xl mx-auto px-4 py-6">
+        <div id="prestige-container">
+          <!-- Conteúdo será inserido pelo JavaScript -->
+        </div>
+      </section>
+
+      <!-- Seção Procedural -->
+      <section class="w-full max-w-7xl mx-auto px-4 py-6">
+        <div id="procedural-container">
+          <!-- Conteúdo será inserido pelo JavaScript -->
+        </div>
+      </section>
 
       <!-- Loading Screen Overlay -->
       <div
@@ -351,31 +434,36 @@
           class="sticky top-0 bg-dark-card border-b border-gray-700 p-4 flex justify-between items-center"
         >
           <h2 class="text-2xl font-bold text-primary">🏆 Ranking Online</h2>
-          <button
-            id="close-leaderboard"
-            class="text-gray-400 hover:text-white text-3xl font-bold transition"
-          >
-            ×
-          </button>
+          <div class="flex items-center space-x-2">
+            <button
+              id="refresh-leaderboard"
+              class="text-gray-400 hover:text-primary text-2xl transition"
+              title="Atualizar ranking"
+            >
+              🔄
+            </button>
+            <button
+              id="close-leaderboard"
+              class="text-gray-400 hover:text-white text-3xl font-bold transition"
+            >
+              ×
+            </button>
+          </div>
         </div>
 
         <!-- Conteúdo do Ranking -->
         <div class="p-4">
           <div id="leaderboard-list" class="space-y-2">
             <div class="text-center text-gray-400 py-8">
-              <div
-                class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"
-              ></div>
+              <div class="text-4xl animate-mine-swing mb-3">⛏️</div>
               <p class="text-sm">Carregando...</p>
             </div>
           </div>
         </div>
 
         <!-- Footer do Sidebar -->
-        <div
-          class="sticky bottom-0 bg-dark-card border-t border-gray-700 p-4 text-center"
-        >
-          <p class="text-xs text-gray-400">Atualização automática a cada 10s</p>
+        <div class="sticky bottom-0 bg-dark-card border-t border-gray-700 p-4 text-center">
+          <p class="text-xs text-gray-400">Atualiza ao abrir (cache: 5min)</p>
         </div>
       </div>
 
@@ -529,9 +617,10 @@
     <script src="js/systems/cloud-save.js"></script>
     <script src="js/systems/leaderboard.js"></script>
     <script src="js/systems/themes.js"></script>
+    <script src="js/systems/prestige.js"></script>
     <script src="js/systems/achievements.js"></script>
     <script src="js/systems/inventory.js"></script>
     <script src="js/systems/upgrades.js"></script>
-    <script src="js/systems/stats.js"></script>
+    <script src="js/systems/procedural.js"></script>
   </body>
 </html>
