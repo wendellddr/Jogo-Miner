@@ -528,9 +528,9 @@ function renderAchievements() {
     card.innerHTML = `
       <div class="flex items-start justify-between mb-1">
         <div class="flex items-center space-x-2 flex-1 min-w-0">
-          <span class="text-2xl flex-shrink-0">${achievement.icon}</span>
+          <span class="text-xl flex-shrink-0 pixel-emoji">${achievement.icon}</span>
           <div class="min-w-0 flex-1">
-            <h3 class="text-sm font-bold text-white flex items-center space-x-1 truncate">
+            <h3 class="text-xs font-bold text-white flex items-center space-x-1 truncate pixel-text">
               <span class="truncate">${achievement.name}</span>
               <span class="text-green-400 text-base flex-shrink-0">✓</span>
             </h3>
@@ -538,19 +538,19 @@ function renderAchievements() {
         </div>
         <span class="text-xs font-semibold ${getDifficultyClass(
           achievement.difficulty
-        )} flex-shrink-0 ml-1">
+        )} flex-shrink-0 ml-1 pixel-text-small">
           ${getDifficultyText(achievement.difficulty)}
         </span>
       </div>
       <p class="text-xs text-gray-300 mb-2 line-clamp-2">${achievement.description}</p>
       <div class="mb-1">
-        <div class="w-full bg-gray-700 rounded-full h-1.5">
+        <div class="w-full bg-gray-800 h-2 pixel-progress-bg">
           <div
             class="bg-yellow-400 h-1.5 rounded-full transition-all duration-300"
             style="width: 100%"
           ></div>
         </div>
-        <p class="text-xs text-gray-400 mt-0.5">
+        <p class="text-xs text-gray-400 mt-0.5 pixel-text-small">
           ${currentValue} / ${targetValue}
         </p>
       </div>

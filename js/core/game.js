@@ -148,6 +148,8 @@ function loadGame() {
 
         if (offlineGain > 0) {
           gameState.coins += offlineGain;
+          // Arredonda moedas para inteiro
+          gameState.coins = Math.round(gameState.coins);
           showMessage(
             `Bem-vindo de volta! Ganhos offline: ${formatNumber(
               offlineGain
@@ -169,12 +171,14 @@ function loadGame() {
 // --- Funções Auxiliares de UI ---
 
 function formatNumber(num) {
-  // Formata o número para exibição, incluindo abreviações para números grandes.
+  // Formata o número para exibição como inteiro, incluindo abreviações para números grandes.
   const absNum = Math.abs(num);
-  if (absNum >= 1000000000) return (num / 1000000000).toFixed(2) + " B";
-  if (absNum >= 1000000) return (num / 1000000).toFixed(2) + " M";
-  if (absNum >= 1000) return (num / 1000).toFixed(2) + " K";
-  return parseFloat(num.toFixed(2)).toLocaleString("pt-BR");
+  const roundedNum = Math.round(num);
+  
+  if (absNum >= 1000000000) return Math.round(roundedNum / 1000000000) + " B";
+  if (absNum >= 1000000) return Math.round(roundedNum / 1000000) + " M";
+  if (absNum >= 1000) return Math.round(roundedNum / 1000) + " K";
+  return roundedNum.toLocaleString("pt-BR");
 }
 
 function showMessage(text, isError = false) {
@@ -262,6 +266,46 @@ function createParticles(count, x, y, color = "#FF5733") {
   }
 }
 
+/**
+ * Cria partículas visuais ao clicar no botão
+ * @param {HTMLElement} button - Elemento do botão
+ * @param {boolean} isCritical - Se foi um clique crítico
+ */
+function createClickParticles(button, isCritical = false) {
+  const particlesContainer = button.querySelector("#click-particles");
+  if (!particlesContainer) return;
+
+  const emojis = isCritical 
+    ? ["💥", "⭐", "✨", "💎", "🔥", "⚡"]
+    : ["💰", "✨", "💫", "⭐"];
+
+  const particleCount = isCritical ? 8 : 4;
+
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement("div");
+    particle.className = "click-particle";
+    particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    
+    // Posição aleatória ao redor do centro do botão
+    const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
+    const distance = 30 + Math.random() * 20;
+    const randomX = Math.cos(angle) * distance;
+    const randomY = Math.sin(angle) * distance;
+    
+    particle.style.setProperty("--random-x", randomX / 50);
+    particle.style.setProperty("--random-y", randomY / 50);
+    particle.style.left = "50%";
+    particle.style.top = "50%";
+    particle.style.transform = "translate(-50%, -50%)";
+
+    particlesContainer.appendChild(particle);
+
+    setTimeout(() => {
+      particle.remove();
+    }, 1000);
+  }
+}
+
 function updateUI() {
   // Atualiza Moedas
   document.getElementById("coins-display").textContent = formatNumber(
@@ -288,31 +332,29 @@ function updateUI() {
     "click-rate-display"
   ).textContent = `Moedas/Clique: ${formatNumber(currentCPC)}`;
 
-  // Atualiza texto do botão de clique usando tema se disponível
   const clickButton = document.getElementById("click-button");
+
+  // Atualiza o texto do botão de clique usando tema se disponível
   if (clickButton) {
-    const textSpan = clickButton.querySelector("span:last-child");
-    if (textSpan) {
-      let clickText = "Minerar";
-      if (typeof getCurrentTheme === "function") {
-        const theme = getCurrentTheme();
-        if (theme && theme.texts && theme.texts.clickButton) {
-          clickText = theme.texts.clickButton;
-        }
+    const amountDisplay = clickButton.querySelector("#click-amount-display");
+    if (amountDisplay) {
+      let currentCPC = gameState.coinsPerClick;
+      if (gameState.powerActive) {
+        currentCPC *= gameState.powerMultiplier;
       }
       
-      // Formatação compacta para números grandes
-      let cpcDisplay = formatNumber(currentCPC);
-      if (currentCPC >= 1000000) {
-        // Para números muito grandes, usa notação científica curta
-        const formatted = currentCPC >= 1000000000 
-          ? (currentCPC / 1000000000).toFixed(1) + "B"
-          : (currentCPC / 1000000).toFixed(1) + "M";
-        cpcDisplay = formatted;
+      // Aplica buffs do inventário
+      if (typeof getInventoryCPCMultiplier === "function") {
+        currentCPC *= getInventoryCPCMultiplier();
       }
-      
-      textSpan.textContent = `${clickText} (+${cpcDisplay})`;
-      textSpan.className = "text-xs sm:text-sm text-center break-words flex-1 min-w-0 leading-tight";
+      amountDisplay.textContent = `+${formatNumber(currentCPC)} Moedas`;
+    }
+
+    // Adiciona classe de power ativo para efeito visual
+    if (gameState.powerActive) {
+      clickButton.classList.add("power-active");
+    } else {
+      clickButton.classList.remove("power-active");
     }
   }
 
@@ -455,7 +497,7 @@ function updateUI() {
       formatNumber(nextCost);
     document.getElementById(`count-${upgrade.id}`).textContent = level;
 
-    // Atualiza Estado Visual (CSS classes e disabled state)
+    // Atualiza Estado Visual (CSS classes e disabled state) - Estilo 8-bit
     const cardBaseClasses =
       "flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl transition duration-200 hover:bg-gray-700/70 border-2 border-transparent";
 
@@ -582,7 +624,7 @@ function calculateCost(upgradeId) {
   const upgrade = getUpgradeDefinition(upgradeId);
   const level = getUpgradeLevel(upgradeId);
   if (!upgrade) return Infinity;
-  return upgrade.baseCost * Math.pow(upgrade.costMultiplier, level);
+  return Math.round(upgrade.baseCost * Math.pow(upgrade.costMultiplier, level));
 }
 
 function calculateTotalCPS() {
@@ -1007,6 +1049,8 @@ function clickCoin() {
     }
   }
 
+  // Arredonda o valor ganho para inteiro antes de adicionar
+  earnedAmount = Math.round(earnedAmount);
   gameState.coins += earnedAmount;
 
   // Rastreia total de moedas ganhas para progresso de mundos
@@ -1014,6 +1058,10 @@ function clickCoin() {
     gameState.totalCoinsEarned = 0;
   }
   gameState.totalCoinsEarned += earnedAmount;
+  
+  // Arredonda moedas para inteiro
+  gameState.coins = Math.round(gameState.coins);
+  gameState.totalCoinsEarned = Math.round(gameState.totalCoinsEarned);
 
   // Rastreia clique
   if (typeof trackClick === "function") {
@@ -1095,6 +1143,11 @@ function activatePower() {
     if (typeof trackPowerActivated === "function") {
       trackPowerActivated();
     }
+    
+    // Rastreia uso de poder para estatísticas
+    if (typeof trackPowerUsed === "function") {
+      trackPowerUsed();
+    }
 
     showMessage(
       `MODO HIPER-MINERAÇÃO ATIVADO! Ganhos x${gameState.powerMultiplier}.`,
@@ -1132,6 +1185,8 @@ function buyUpgrade(upgradeId) {
 
   if (gameState.coins >= cost) {
     gameState.coins -= cost;
+    // Arredonda moedas para inteiro após compra
+    gameState.coins = Math.round(gameState.coins);
 
     gameState.upgradeLevels[upgradeId] = getUpgradeLevel(upgradeId) + 1;
 
@@ -1256,6 +1311,14 @@ function gameLoop() {
   // Recalcula CPS e CPC (sempre bom recalcular no loop)
   gameState.coinsPerSecond = calculateTotalCPS();
   gameState.coinsPerClick = calculateTotalCPC();
+  
+  // Atualiza estatísticas de CPS e CPC máximo
+  if (typeof updateHighestCPS === "function") {
+    updateHighestCPS(gameState.coinsPerSecond);
+  }
+  if (typeof updateHighestCPC === "function") {
+    updateHighestCPC(gameState.coinsPerClick);
+  }
 
   let currentCPS = gameState.coinsPerSecond;
 
@@ -1267,6 +1330,9 @@ function gameLoop() {
     const earned = currentCPS * deltaTime;
     gameState.coins += earned;
     gameState.totalCoinsEarned += earned; // Rastreia total ganho para progresso
+    // Arredonda moedas para inteiro
+    gameState.coins = Math.round(gameState.coins);
+    gameState.totalCoinsEarned = Math.round(gameState.totalCoinsEarned);
   }
 
   lastUpdateTime = now;
@@ -1345,32 +1411,32 @@ function renderUpgradeCard(upgrade, container, isLocked = false) {
   const level = getUpgradeLevel(upgrade.id);
   const gainTextType = upgrade.type === "click" ? "CPC" : "MPS";
 
-  // Obtém emoji do upgrade baseado no tema atual
+  // Obtém emoji/imagem do upgrade baseado no tema atual
   let upgradeIcon = upgrade.icon;
   if (typeof getUpgradeEmoji === "function") {
     upgradeIcon = getUpgradeEmoji(upgrade.id);
   }
 
   if (isLocked) {
-    // Renderização para item BLOQUEADO (Dica)
+    // Renderização para item BLOQUEADO (Dica) - Estilo 8-bit
     card.className =
-      "locked-card p-4 rounded-xl transition duration-200 bg-gray-800/50 flex items-center space-x-4";
+      "locked-card pixel-border p-3 flex items-center space-x-3";
     card.innerHTML = `
-            <span class="text-4xl text-gray-500">🔒</span>
-            <div>
-                <p class="text-xl font-semibold text-gray-400">Upgrade Desconhecido</p>
-                <p class="text-sm text-gray-500">Alcance ${formatNumber(
+            <span class="text-3xl text-gray-500 pixel-emoji">🔒</span>
+            <div class="flex-1">
+                <p class="text-base font-semibold text-gray-400 pixel-text">Upgrade Desconhecido</p>
+                <p class="text-xs text-gray-500 pixel-text-small">Alcance ${formatNumber(
                   upgrade.unlockCPS
-                )} MPS para desbloquear este item.</p>
+                )} MPS para desbloquear</p>
             </div>
         `;
   } else {
-    // Renderização para item ATIVO (Comprável)
+    // Renderização para item ATIVO (Comprável) - Estilo 8-bit
     card.className =
       "flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl transition duration-200 bg-gray-700/50 hover:bg-gray-700/70 border-2 border-transparent";
     card.innerHTML = `
             <div class="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 mb-3 sm:mb-0">
-                <span class="text-3xl sm:text-4xl flex-shrink-0">${upgradeIcon}</span>
+                <span class="text-3xl sm:text-4xl flex-shrink-0 item-icon-container">${upgradeIcon}</span>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center flex-wrap gap-2">
                         <p class="text-base sm:text-lg font-semibold">${

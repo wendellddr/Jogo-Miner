@@ -12,6 +12,7 @@ let UPGRADE_DEFINITIONS = [
     name: "Força Manual",
     description: "Aumenta a força muscular para cliques mais eficazes.",
     icon: "✊",
+    image: "assets/upgrades/forca_manual.png",
     baseCost: 10,
     costMultiplier: 1.15,
     baseGain: 0.05,
@@ -333,11 +334,36 @@ const UPGRADE_EMOJIS_BY_THEME = {
 };
 
 /**
- * Obtém o emoji de um upgrade baseado no tema atual
+ * Obtém o emoji/imagem de um upgrade baseado no tema atual
+ * @param {string} upgradeId - ID do upgrade
+ * @returns {string} Emoji ou HTML da imagem do upgrade
+ */
+function getUpgradeEmoji(upgradeId) {
+  // Busca o upgrade
+  const upgrade =
+    UPGRADE_DEFINITIONS.find((u) => u.id === upgradeId) ||
+    LOCKED_UPGRADES.find((u) => u.id === upgradeId);
+  
+  if (!upgrade) return "❓";
+  
+  // Se o upgrade tem uma imagem customizada explícita, retorna HTML da imagem
+  if (upgrade.image) {
+    return `<img src="${upgrade.image}" alt="${upgrade.name}" class="w-full h-full object-contain item-image" />`;
+  }
+  
+  // Tenta carregar automaticamente de assets/upgrades/[id].png
+  const imagePath = `assets/upgrades/${upgradeId}.png`;
+  
+  // Sempre tenta primeiro a imagem e deixa o CSS fallback do emoji
+  return `<img src="${imagePath}" alt="${upgrade.name}" class="w-full h-full object-contain item-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" /><span style="display:none;">${upgrade.icon}</span>`;
+}
+
+/**
+ * Obtém o emoji de um upgrade (versão de texto puro para compatibilidade)
  * @param {string} upgradeId - ID do upgrade
  * @returns {string} Emoji do upgrade
  */
-function getUpgradeEmoji(upgradeId) {
+function getUpgradeEmojiText(upgradeId) {
   // Obtém o tema atual
   if (typeof getCurrentTheme === "function") {
     const theme = getCurrentTheme();
