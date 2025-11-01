@@ -1,0 +1,556 @@
+{
+  "total_items": 60,
+  "categorias": {
+    "itens_magicos": {
+      "nome": "Itens Mágicos",
+      "descricao": "Itens especiais que podem dropar em qualquer lugar",
+      "total": 12,
+      "items": [
+        {
+          "id": "gem_power",
+          "nome": "Gema de Poder",
+          "descricao": "Aumenta CPC em 10%",
+          "icone": "🟢",
+          "raridade": "comum",
+          "buff": "cpc_multiplier",
+          "valor": 0.1
+        },
+        {
+          "id": "crystal_strength",
+          "nome": "Cristal de Força",
+          "descricao": "Aumenta CPC em 25%",
+          "icone": "🔵",
+          "raridade": "incomum",
+          "buff": "cpc_multiplier",
+          "valor": 0.25
+        },
+        {
+          "id": "diamond_might",
+          "nome": "Diamante do Poder",
+          "descricao": "Aumenta CPC em 50%",
+          "icone": "💠",
+          "raridade": "raro",
+          "buff": "cpc_multiplier",
+          "valor": 0.5
+        },
+        {
+          "id": "speed_crystal",
+          "nome": "Cristal de Velocidade",
+          "descricao": "Aumenta CPS em 15%",
+          "icone": "⚡",
+          "raridade": "comum",
+          "buff": "cps_multiplier",
+          "valor": 0.15
+        },
+        {
+          "id": "time_gem",
+          "nome": "Gema Temporal",
+          "descricao": "Aumenta CPS em 30%",
+          "icone": "⏰",
+          "raridade": "incomum",
+          "buff": "cps_multiplier",
+          "valor": 0.3
+        },
+        {
+          "id": "infinity_stone",
+          "nome": "Pedra Infinita",
+          "descricao": "Aumenta CPS em 60%",
+          "icone": "♾️",
+          "raridade": "raro",
+          "buff": "cps_multiplier",
+          "valor": 0.6
+        },
+        {
+          "id": "crit_charm",
+          "nome": "Amuleto Crítico",
+          "descricao": "Aumenta chance crítica em 2%",
+          "icone": "🎯",
+          "raridade": "comum",
+          "buff": "critical_chance",
+          "valor": 0.02
+        },
+        {
+          "id": "lucky_clover",
+          "nome": "Trevo da Sorte",
+          "descricao": "Aumenta chance crítica em 5%",
+          "icone": "🍀",
+          "raridade": "incomum",
+          "buff": "critical_chance",
+          "valor": 0.05
+        },
+        {
+          "id": "fate_dice",
+          "nome": "Dado do Destino",
+          "descricao": "Aumenta chance crítica em 10%",
+          "icone": "🎲",
+          "raridade": "raro",
+          "buff": "critical_chance",
+          "valor": 0.1
+        },
+        {
+          "id": "power_ring",
+          "nome": "Anel de Poder",
+          "descricao": "Aumenta multiplicador crítico em 20%",
+          "icone": "💍",
+          "raridade": "comum",
+          "buff": "critical_multiplier",
+          "valor": 0.2
+        },
+        {
+          "id": "chaos_orb",
+          "nome": "Orbe do Caos",
+          "descricao": "Aumenta multiplicador crítico em 50%",
+          "icone": "🔮",
+          "raridade": "incomum",
+          "buff": "critical_multiplier",
+          "valor": 0.5
+        },
+        {
+          "id": "coin_magnet",
+          "nome": "Ímã de Moedas",
+          "descricao": "Aumenta ganho total em 5%",
+          "icone": "🧲",
+          "raridade": "incomum",
+          "buff": "total_multiplier",
+          "valor": 0.05
+        },
+        {
+          "id": "multiplier_gem",
+          "nome": "Gema Multiplicadora",
+          "descricao": "Aumenta ganho total em 15%",
+          "icone": "✨",
+          "raridade": "raro",
+          "buff": "total_multiplier",
+          "valor": 0.15
+        }
+      ]
+    },
+    "itens_rpg": {
+      "nome": "Itens RPG das Cavernas",
+      "descricao": "Itens temáticos de RPG que dropam nas Cavernas de Mineração",
+      "total": 48,
+      "armaduras": [
+        {
+          "id": "leather_armor",
+          "nome": "Armadura de Couro",
+          "descricao": "Aumenta CPC em 8%",
+          "icone": "🧶",
+          "raridade": "comum",
+          "buff": "cpc_multiplier",
+          "valor": 0.08
+        },
+        {
+          "id": "chain_mail",
+          "nome": "Cota de Malha",
+          "descricao": "Aumenta CPC em 12%",
+          "icone": "🛡️",
+          "raridade": "comum",
+          "buff": "cpc_multiplier",
+          "valor": 0.12
+        },
+        {
+          "id": "leather_helm",
+          "nome": "Capacete de Couro",
+          "descricao": "Aumenta CPC em 6%",
+          "icone": "⛑️",
+          "raridade": "comum",
+          "buff": "cpc_multiplier",
+          "valor": 0.06
+        },
+        {
+          "id": "gauntlets",
+          "nome": "Manoplas de Ferro",
+          "descricao": "Aumenta CPC em 7%",
+          "icone": "🥊",
+          "raridade": "comum",
+          "buff": "cpc_multiplier",
+          "valor": 0.07
+        },
+        {
+          "id": "steel_plate",
+          "nome": "Armadura de Aço",
+          "descricao": "Aumenta CPC em 20%",
+          "icone": "🛡️",
+          "raridade": "incomum",
+          "buff": "cpc_multiplier",
+          "valor": 0.2
+        },
+        {
+          "id": "mithril_armor",
+          "nome": "Armadura de Mithril",
+          "descricao": "Aumenta CPC em 30%",
+          "icone": "🛡️",
+          "raridade": "incomum",
+          "buff": "cpc_multiplier",
+          "valor": 0.3
+        },
+        {
+          "id": "knights_helm",
+          "nome": "Capacete de Cavaleiro",
+          "descricao": "Aumenta CPC em 18%",
+          "icone": "🪖",
+          "raridade": "incomum",
+          "buff": "cpc_multiplier",
+          "valor": 0.18
+        },
+        {
+          "id": "dragon_scale",
+          "nome": "Armadura de Escamas de Dragão",
+          "descricao": "Aumenta CPC em 45%",
+          "icone": "🐉",
+          "raridade": "raro",
+          "buff": "cpc_multiplier",
+          "valor": 0.45
+        },
+        {
+          "id": "demonic_plate",
+          "nome": "Armadura Demoníaca",
+          "descricao": "Aumenta CPC em 60%",
+          "icone": "🛡️",
+          "raridade": "raro",
+          "buff": "cpc_multiplier",
+          "valor": 0.6
+        },
+        {
+          "id": "crown_of_kings",
+          "nome": "Coroa Real",
+          "descricao": "Aumenta CPC em 40%",
+          "icone": "👑",
+          "raridade": "raro",
+          "buff": "cpc_multiplier",
+          "valor": 0.4
+        },
+        {
+          "id": "power_gauntlets",
+          "nome": "Manoplas do Poder",
+          "descricao": "Aumenta CPC em 35%",
+          "icone": "💪",
+          "raridade": "raro",
+          "buff": "cpc_multiplier",
+          "valor": 0.35
+        },
+        {
+          "id": "paladin_armor",
+          "nome": "Armadura de Paladino",
+          "descricao": "Aumenta CPC em 50%",
+          "icone": "🛡️",
+          "raridade": "raro",
+          "buff": "cpc_multiplier",
+          "valor": 0.5
+        },
+        {
+          "id": "berserker_armor",
+          "nome": "Armadura de Berserker",
+          "descricao": "Aumenta CPC em 55%",
+          "icone": "🛡️",
+          "raridade": "raro",
+          "buff": "cpc_multiplier",
+          "valor": 0.55
+        }
+      ],
+      "armas": [
+        {
+          "id": "iron_sword",
+          "nome": "Espada de Ferro",
+          "descricao": "Aumenta CPS em 12%",
+          "icone": "🗡️",
+          "raridade": "comum",
+          "buff": "cps_multiplier",
+          "valor": 0.12
+        },
+        {
+          "id": "bronze_sword",
+          "nome": "Espada de Bronze",
+          "descricao": "Aumenta CPS em 8%",
+          "icone": "🗡️",
+          "raridade": "comum",
+          "buff": "cps_multiplier",
+          "valor": 0.08
+        },
+        {
+          "id": "iron_axe",
+          "nome": "Machado de Ferro",
+          "descricao": "Aumenta CPS em 10%",
+          "icone": "🪓",
+          "raridade": "comum",
+          "buff": "cps_multiplier",
+          "valor": 0.1
+        },
+        {
+          "id": "war_hammer",
+          "nome": "Martelo de Guerra",
+          "descricao": "Aumenta CPS em 14%",
+          "icone": "🔨",
+          "raridade": "comum",
+          "buff": "cps_multiplier",
+          "valor": 0.14
+        },
+        {
+          "id": "spear",
+          "nome": "Lança de Caça",
+          "descricao": "Aumenta CPS em 9%",
+          "icone": "🔱",
+          "raridade": "comum",
+          "buff": "cps_multiplier",
+          "valor": 0.09
+        },
+        {
+          "id": "travelers_boots",
+          "nome": "Botas do Viajante",
+          "descricao": "Aumenta CPS em 7%",
+          "icone": "👢",
+          "raridade": "comum",
+          "buff": "cps_multiplier",
+          "valor": 0.07
+        },
+        {
+          "id": "steel_blade",
+          "nome": "Lâmina de Aço",
+          "descricao": "Aumenta CPS em 28%",
+          "icone": "⚔️",
+          "raridade": "incomum",
+          "buff": "cps_multiplier",
+          "valor": 0.28
+        },
+        {
+          "id": "mithril_sword",
+          "nome": "Espada de Mithril",
+          "descricao": "Aumenta CPS em 35%",
+          "icone": "🗡️",
+          "raridade": "incomum",
+          "buff": "cps_multiplier",
+          "valor": 0.35
+        },
+        {
+          "id": "war_axe",
+          "nome": "Machado de Guerra",
+          "descricao": "Aumenta CPS em 25%",
+          "icone": "🪓",
+          "raridade": "incomum",
+          "buff": "cps_multiplier",
+          "valor": 0.25
+        },
+        {
+          "id": "trident",
+          "nome": "Tridente do Nereu",
+          "descricao": "Aumenta CPS em 32%",
+          "icone": "🔱",
+          "raridade": "incomum",
+          "buff": "cps_multiplier",
+          "valor": 0.32
+        },
+        {
+          "id": "legendary_sword",
+          "nome": "Espada Lendária",
+          "descricao": "Aumenta CPS em 55%",
+          "icone": "🗡️",
+          "raridade": "raro",
+          "buff": "cps_multiplier",
+          "valor": 0.55
+        },
+        {
+          "id": "excalibur",
+          "nome": "Excalibur",
+          "descricao": "Aumenta CPS em 70%",
+          "icone": "⚔️",
+          "raridade": "raro",
+          "buff": "cps_multiplier",
+          "valor": 0.7
+        },
+        {
+          "id": "dragonslayer_axe",
+          "nome": "Machado Matador de Dragões",
+          "descricao": "Aumenta CPS em 65%",
+          "icone": "🪓",
+          "raridade": "raro",
+          "buff": "cps_multiplier",
+          "valor": 0.65
+        },
+        {
+          "id": "mjolnir",
+          "nome": "Mjölnir",
+          "descricao": "Aumenta CPS em 75%",
+          "icone": "🔨",
+          "raridade": "raro",
+          "buff": "cps_multiplier",
+          "valor": 0.75
+        },
+        {
+          "id": "winged_boots",
+          "nome": "Botas Aladas",
+          "descricao": "Aumenta CPS em 40%",
+          "icone": "👢",
+          "raridade": "raro",
+          "buff": "cps_multiplier",
+          "valor": 0.4
+        }
+      ],
+      "arcos": [
+        {
+          "id": "oak_bow",
+          "nome": "Arco de Carvalho",
+          "descricao": "Aumenta chance crítica em 3%",
+          "icone": "🏹",
+          "raridade": "comum",
+          "buff": "critical_chance",
+          "valor": 0.03
+        },
+        {
+          "id": "longbow",
+          "nome": "Arco Longo",
+          "descricao": "Aumenta chance crítica em 2%",
+          "icone": "🏹",
+          "raridade": "comum",
+          "buff": "critical_chance",
+          "valor": 0.02
+        },
+        {
+          "id": "elven_bow",
+          "nome": "Arco Élfico",
+          "descricao": "Aumenta chance crítica em 6%",
+          "icone": "🏹",
+          "raridade": "incomum",
+          "buff": "critical_chance",
+          "valor": 0.06
+        },
+        {
+          "id": "crossbow",
+          "nome": "Besta",
+          "descricao": "Aumenta chance crítica em 4%",
+          "icone": "🏹",
+          "raridade": "incomum",
+          "buff": "critical_chance",
+          "valor": 0.04
+        },
+        {
+          "id": "dragonslayer_bow",
+          "nome": "Arco Matador de Dragões",
+          "descricao": "Aumenta chance crítica em 8%",
+          "icone": "🏹",
+          "raridade": "raro",
+          "buff": "critical_chance",
+          "valor": 0.08
+        }
+      ],
+      "escudos": [
+        {
+          "id": "wooden_shield",
+          "nome": "Escudo de Madeira",
+          "descricao": "Aumenta multiplicador crítico em 25%",
+          "icone": "🛡️",
+          "raridade": "comum",
+          "buff": "critical_multiplier",
+          "valor": 0.25
+        },
+        {
+          "id": "iron_shield",
+          "nome": "Escudo de Ferro",
+          "descricao": "Aumenta multiplicador crítico em 30%",
+          "icone": "🛡️",
+          "raridade": "comum",
+          "buff": "critical_multiplier",
+          "valor": 0.3
+        },
+        {
+          "id": "steel_shield",
+          "nome": "Escudo de Aço",
+          "descricao": "Aumenta multiplicador crítico em 55%",
+          "icone": "🛡️",
+          "raridade": "incomum",
+          "buff": "critical_multiplier",
+          "valor": 0.55
+        },
+        {
+          "id": "tower_shield",
+          "nome": "Escudo Torre",
+          "descricao": "Aumenta multiplicador crítico em 60%",
+          "icone": "🛡️",
+          "raridade": "incomum",
+          "buff": "critical_multiplier",
+          "valor": 0.6
+        },
+        {
+          "id": "aegis_shield",
+          "nome": "Égide Sagrada",
+          "descricao": "Aumenta multiplicador crítico em 80%",
+          "icone": "🛡️",
+          "raridade": "raro",
+          "buff": "critical_multiplier",
+          "valor": 0.8
+        }
+      ],
+      "acessorios": [
+        {
+          "id": "knights_ring",
+          "nome": "Anel do Cavaleiro",
+          "descricao": "Aumenta ganho total em 8%",
+          "icone": "💍",
+          "raridade": "incomum",
+          "buff": "total_multiplier",
+          "valor": 0.08
+        },
+        {
+          "id": "ring_of_power",
+          "nome": "Anel do Poder",
+          "descricao": "Aumenta ganho total em 12%",
+          "icone": "💍",
+          "raridade": "incomum",
+          "buff": "total_multiplier",
+          "valor": 0.12
+        },
+        {
+          "id": "mage_cloak",
+          "nome": "Manto do Mago",
+          "descricao": "Aumenta ganho total em 10%",
+          "icone": "🧙",
+          "raridade": "incomum",
+          "buff": "total_multiplier",
+          "valor": 0.1
+        },
+        {
+          "id": "one_ring",
+          "nome": "O Um Anel",
+          "descricao": "Aumenta ganho total em 25%",
+          "icone": "💍",
+          "raridade": "raro",
+          "buff": "total_multiplier",
+          "valor": 0.25
+        },
+        {
+          "id": "shadow_cloak",
+          "nome": "Manto das Sombras",
+          "descricao": "Aumenta ganho total em 20%",
+          "icone": "🦇",
+          "raridade": "raro",
+          "buff": "total_multiplier",
+          "valor": 0.2
+        }
+      ]
+    }
+  },
+  "estatisticas": {
+    "por_raridade": {
+      "comum": 16,
+      "incomum": 24,
+      "raro": 20
+    },
+    "por_buff": {
+      "cpc_multiplier": 16,
+      "cps_multiplier": 20,
+      "critical_chance": 10,
+      "critical_multiplier": 11,
+      "total_multiplier": 9
+    }
+  },
+  "vendido_por": {
+    "comum": 500,
+    "incomum": 1500,
+    "raro": 5000
+  },
+  "bonus_por_raridade_no_equip": {
+    "comum": 0,
+    "incomum": "+5% extra",
+    "raro": "+15% extra"
+  }
+}
+

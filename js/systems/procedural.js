@@ -36,6 +36,135 @@ const MACHINE_TYPES = [
 const MACHINE_ICONS = ["⚙️", "🔧", "💠", "🛠️", "⚡", "🔨", "⚒️", "🪛", "🔩", "🗜️"];
 const MACHINE_COLORS = ["#FFC300", "#00FFFF", "#FF1493", "#00FF00", "#FF00FF", "#FFFF00", "#FF4500", "#9400D3", "#FF69B4", "#1E90FF"];
 
+// Tipos de Eventos Temporários
+const EVENT_TYPES = [
+  {
+    type: "bonus_time",
+    name: "⏰ Tempo de Bônus",
+    description: "Todos os ganhos x2 por 5 minutos!",
+    duration: 300000, // 5 minutos
+    bonus: { multiplier: 2 },
+    icon: "⏰",
+    color: "#FFC300",
+  },
+  {
+    type: "critical_storm",
+    name: "⚡ Tempestade Crítica",
+    description: "Chance crítica +50% por 3 minutos!",
+    duration: 180000, // 3 minutos
+    bonus: { criticalChance: 0.5 },
+    icon: "⚡",
+    color: "#FF1493",
+  },
+  {
+    type: "coin_rain",
+    name: "💰 Chuva de Moedas",
+    description: "CPS x3 por 4 minutos!",
+    duration: 240000, // 4 minutos
+    bonus: { cpsMultiplier: 3 },
+    icon: "💰",
+    color: "#00FF00",
+  },
+  {
+    type: "mega_click",
+    name: "💪 Mega Clique",
+    description: "Cliques x5 por 2 minutos!",
+    duration: 120000, // 2 minutos
+    bonus: { clickMultiplier: 5 },
+    icon: "💪",
+    color: "#00FFFF",
+  },
+];
+
+// Estado de eventos ativos
+let activeEvents = [];
+
+/**
+ * Gera evento aleatório
+ */
+function generateRandomEvent() {
+  if (!gameState || typeof gameState === "undefined") return;
+  
+  const randomEvent = EVENT_TYPES[Math.floor(Math.random() * EVENT_TYPES.length)];
+  const event = {
+    id: `event_${Date.now()}`,
+    type: randomEvent.type,
+    name: randomEvent.name,
+    description: randomEvent.description,
+    icon: randomEvent.icon,
+    color: randomEvent.color,
+    bonus: randomEvent.bonus,
+    startTime: Date.now(),
+    endTime: Date.now() + randomEvent.duration,
+    duration: randomEvent.duration,
+  };
+  
+  activeEvents.push(event);
+  
+  // Mostra notificação
+  if (typeof showMessage === "function") {
+    showMessage(`🎉 ${event.name} ativado! ${event.description}`, false);
+  }
+  
+  // Remove evento quando expira
+  setTimeout(() => {
+    const index = activeEvents.findIndex(e => e.id === event.id);
+    if (index !== -1) {
+      activeEvents.splice(index, 1);
+      if (typeof showMessage === "function") {
+        showMessage(`⏰ ${event.name} finalizado!`, true);
+      }
+    }
+  }, randomEvent.duration);
+  
+  saveProcedural();
+  return event;
+}
+
+/**
+ * Obtém multiplicadores de eventos ativos
+ */
+function getEventMultipliers() {
+  let multipliers = {
+    total: 1,
+    click: 1,
+    cps: 1,
+    criticalChance: 0,
+  };
+  
+  activeEvents.forEach(event => {
+    if (event.bonus.multiplier) {
+      multipliers.total *= event.bonus.multiplier;
+    }
+    if (event.bonus.clickMultiplier) {
+      multipliers.click *= event.bonus.clickMultiplier;
+    }
+    if (event.bonus.cpsMultiplier) {
+      multipliers.cps *= event.bonus.cpsMultiplier;
+    }
+    if (event.bonus.criticalChance) {
+      multipliers.criticalChance += event.bonus.criticalChance;
+    }
+  });
+  
+  return multipliers;
+}
+
+/**
+ * Inicia eventos aleatórios periodicamente
+ */
+function startEventSystem() {
+  // Evento a cada 5-10 minutos aleatoriamente
+  const randomInterval = (Math.random() * 5 + 5) * 60000; // 5-10 minutos
+  
+  setTimeout(() => {
+    if (activeEvents.length < PROCEDURAL_CONFIG.MAX_ACTIVE_EVENTS) {
+      generateRandomEvent();
+    }
+    startEventSystem(); // Programa próximo evento
+  }, randomInterval);
+}
+
 /**
  * Gera máquinas proceduralmente baseado na tier atual
  */
@@ -149,6 +278,9 @@ function initializeProcedural() {
     }
   }
   
+  // Inicia sistema de eventos
+  startEventSystem();
+  
   saveProcedural();
   
   // Renderiza UI se o container existir
@@ -192,11 +324,45 @@ function renderProceduralUI() {
     `;
   });
   
+  // Renderiza eventos ativos
+  let eventsHtml = "";
+  if (activeEvents.length > 0) {
+    eventsHtml = `
+      <div class="bg-purple-900/20 rounded-lg p-3 border border-purple-600 mb-4">
+        <h3 class="text-sm font-bold text-purple-200 mb-2 flex items-center space-x-2">
+          <span>🎉</span>
+          <span>Eventos Ativos</span>
+        </h3>
+        <div class="space-y-2">
+          ${activeEvents.map(event => {
+            const remainingTime = Math.max(0, Math.floor((event.endTime - Date.now()) / 1000));
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            return `
+              <div class="bg-blue-800/20 rounded-lg p-2 border border-blue-600">
+                <div class="flex items-center space-x-2">
+                  <span class="text-2xl">${event.icon}</span>
+                  <div class="flex-1">
+                    <p class="font-bold text-white text-xs">${event.name}</p>
+                    <p class="text-xs text-gray-300">${event.description}</p>
+                  </div>
+                  <span class="text-xs text-white font-bold">${minutes}:${seconds.toString().padStart(2, '0')}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
   const nextTierCost = PROCEDURAL_CONFIG.TIER_BASE_COST * Math.pow(PROCEDURAL_CONFIG.TIER_COST_MULTIPLIER, proceduralState.progressionTier);
   const canUnlockTier = gameState.coins >= nextTierCost;
   
   container.innerHTML = `
     <div class="space-y-4">
+      ${eventsHtml}
+      
       <!-- Card de Evolução -->
       <div class="bg-gradient-to-br from-blue-900 to-cyan-900 rounded-xl p-4 border-2 border-blue-600">
         <div class="mb-3">
@@ -326,6 +492,7 @@ if (typeof window !== "undefined") {
   window.initializeProcedural = initializeProcedural;
   window.renderProceduralUI = renderProceduralUI;
   window.getProceduralCPSMultiplier = getProceduralCPSMultiplier;
+  window.getEventMultipliers = getEventMultipliers;
   window.saveProcedural = saveProcedural;
 }
 

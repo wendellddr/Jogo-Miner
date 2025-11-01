@@ -412,6 +412,10 @@ function stopAutoRefresh() {
 
 // Função de inicialização
 function initLeaderboardSystem() {
+  // Previne múltiplas inicializações
+  if (window.leaderboardSystemInitialized) return;
+  window.leaderboardSystemInitialized = true;
+  
   initializeLeaderboard();
   // NÃO inicia atualização automática (economiza requisições!)
   // startAutoRefresh();
@@ -445,6 +449,10 @@ if (typeof window !== "undefined") {
  * Inicializa a UI do sidebar de ranking
  */
 function initializeLeaderboardSidebar() {
+  // Previne múltiplas inicializações
+  if (window.leaderboardSidebarInitialized) return;
+  window.leaderboardSidebarInitialized = true;
+  
   const leaderboardButton = document.getElementById("leaderboard-button");
   const closeButton = document.getElementById("close-leaderboard");
   const refreshButton = document.getElementById("refresh-leaderboard");
@@ -502,9 +510,9 @@ function initializeLeaderboardSidebar() {
     overlay.addEventListener("click", () => closeLeaderboardSidebar());
   }
 
-  // Fechar com ESC
+  // Fechar com ESC (adiciona apenas uma vez globalmente)
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
+    if (e.key === "Escape" && sidebar && !sidebar.classList.contains("translate-x-full")) {
       closeLeaderboardSidebar();
     }
   });
@@ -529,6 +537,10 @@ function closeLeaderboardSidebar() {
  * Inicializa a UI do modal de ID
  */
 function initializePlayerIdModal() {
+  // Previne múltiplas inicializações
+  if (window.playerIdModalInitialized) return;
+  window.playerIdModalInitialized = true;
+  
   const myIdButton = document.getElementById("my-id-button");
   const closeIdModal = document.getElementById("close-id-modal");
   const modal = document.getElementById("player-id-modal");
@@ -537,7 +549,8 @@ function initializePlayerIdModal() {
   const loadIdButton = document.getElementById("load-id-button");
   const loadIdInput = document.getElementById("load-id-input");
 
-  // Abrir modal
+  // Abrir modal (myIdButton já é tratado no menu.js)
+  /* Código comentado pois o handler está no menu.js
   if (myIdButton) {
     myIdButton.addEventListener("click", () => {
       if (modal) {
@@ -562,7 +575,8 @@ function initializePlayerIdModal() {
       }
     });
   }
-
+  */
+  
   // Fechar modal
   if (closeIdModal) {
     closeIdModal.addEventListener("click", () => {

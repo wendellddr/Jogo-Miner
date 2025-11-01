@@ -372,6 +372,10 @@ function showConfirmNewGameModal() {
  * Inicializa o menu de navegação do jogo (sidebar lateral)
  */
 function initializeGameMenu() {
+  // Previne múltiplas inicializações
+  if (window.gameMenuInitialized) return;
+  window.gameMenuInitialized = true;
+  
   const menuButton = document.getElementById("menu-button");
   const closeMenuButton = document.getElementById("close-main-menu");
   const menuSidebar = document.getElementById("main-menu-sidebar");
@@ -524,6 +528,74 @@ function initializeGameMenu() {
         proceduralOverlay.classList.remove("hidden");
       }
     });
+  }
+
+  // Abre Cavernas de Mineração
+  const dungeonButton = document.getElementById("menu-dungeon-button");
+  if (dungeonButton) {
+    dungeonButton.addEventListener("click", () => {
+      menuSidebar.classList.add("-translate-x-full");
+      menuOverlay.classList.add("hidden");
+      
+      // Abre o sidebar de dungeon diretamente
+      const dungeonSidebar = document.getElementById("dungeon-sidebar");
+      const dungeonOverlay = document.getElementById("dungeon-overlay");
+      
+      if (dungeonSidebar && dungeonOverlay) {
+        if (typeof renderDungeonUI === "function") {
+          renderDungeonUI();
+        }
+        dungeonSidebar.classList.remove("translate-x-full");
+        dungeonOverlay.classList.remove("hidden");
+      }
+    });
+  }
+
+  // Abre Estatísticas
+  const statsButton = document.getElementById("menu-stats-button");
+  if (statsButton) {
+    statsButton.addEventListener("click", () => {
+      menuSidebar.classList.add("-translate-x-full");
+      menuOverlay.classList.add("hidden");
+      
+      // Abre o sidebar de estatísticas diretamente
+      const statsSidebar = document.getElementById("stats-sidebar");
+      const statsOverlay = document.getElementById("stats-overlay");
+      
+      if (statsSidebar && statsOverlay) {
+        if (typeof renderStatsUI === "function") {
+          renderStatsUI();
+        }
+        statsSidebar.classList.remove("translate-x-full");
+        statsOverlay.classList.remove("hidden");
+      }
+    });
+  }
+
+  // Abre Recompensas Diárias
+  const dailyRewardsButton = document.getElementById("menu-daily-rewards-button");
+  if (dailyRewardsButton) {
+    dailyRewardsButton.addEventListener("click", () => {
+      menuSidebar.classList.add("-translate-x-full");
+      menuOverlay.classList.add("hidden");
+      
+      // Abre o sidebar de recompensas diárias diretamente
+      const dailyRewardsSidebar = document.getElementById("daily-rewards-sidebar");
+      const dailyRewardsOverlay = document.getElementById("daily-rewards-overlay");
+      
+      if (dailyRewardsSidebar && dailyRewardsOverlay) {
+        if (typeof renderDailyRewardsUI === "function") {
+          renderDailyRewardsUI();
+        }
+        dailyRewardsSidebar.classList.remove("translate-x-full");
+        dailyRewardsOverlay.classList.remove("hidden");
+      }
+    });
+  }
+  
+  // Inicializa sidebar de recompensas diárias se ainda não foi
+  if (typeof initializeDailyRewards === "function") {
+    initializeDailyRewards();
   }
 }
 

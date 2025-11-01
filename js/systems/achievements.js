@@ -345,10 +345,15 @@ function completeAchievement(achievement) {
     gameState.coins += achievement.bonus;
     if (typeof showMessage === "function") {
       showMessage(
-        `🏆 Conquista Desbloqueada: ${achievement.name}! Bônus: +${achievement.bonus} moedas!`,
+        `🎉✨ CONQUISTA DESBLOQUEADA! ✨🎉\n${achievement.icon} ${achievement.name}\nBônus: +${achievement.bonus} moedas!`,
         false
       );
     }
+  }
+
+  // Toca som especial
+  if (typeof playUpgradeSound === "function") {
+    playUpgradeSound();
   }
 
   saveAchievements();
@@ -496,21 +501,29 @@ function renderAchievements() {
   }
 
   container.innerHTML = "";
+  
+  // Atualiza contador de conquistas
+  const completedCount = Object.keys(achievementsState.completedAchievements).length;
+  const totalCount = ACHIEVEMENTS_DEFINITIONS.length;
+  const achievementsCount = document.getElementById("achievements-count");
+  if (achievementsCount) {
+    achievementsCount.textContent = `(${completedCount} / ${totalCount})`;
+  }
 
+  // Apenas renderiza conquistas completadas
   ACHIEVEMENTS_DEFINITIONS.forEach((achievement) => {
     const isCompleted =
       achievementsState.completedAchievements[achievement.id] || false;
+    
+    // Só mostra conquistas desbloqueadas
+    if (!isCompleted) return;
+    
     const progress = getAchievementProgress(achievement);
     const currentValue = getAchievementCurrentValue(achievement);
     const targetValue = getAchievementTargetValue(achievement);
-    const progressPercent = Math.min(progress * 100, 100);
 
     const card = document.createElement("div");
-    card.className = `achievement-card p-3 rounded-lg transition duration-200 ${
-      isCompleted
-        ? "bg-yellow-500/20 border-2 border-yellow-400"
-        : "bg-gray-700/50 border border-gray-600"
-    }`;
+    card.className = "achievement-card p-3 rounded-lg transition duration-200 bg-yellow-500/20 border-2 border-yellow-400";
 
     card.innerHTML = `
       <div class="flex items-start justify-between mb-1">
@@ -519,11 +532,7 @@ function renderAchievements() {
           <div class="min-w-0 flex-1">
             <h3 class="text-sm font-bold text-white flex items-center space-x-1 truncate">
               <span class="truncate">${achievement.name}</span>
-              ${
-                isCompleted
-                  ? '<span class="text-green-400 text-base flex-shrink-0">✓</span>'
-                  : ""
-              }
+              <span class="text-green-400 text-base flex-shrink-0">✓</span>
             </h3>
           </div>
         </div>
@@ -533,29 +542,23 @@ function renderAchievements() {
           ${getDifficultyText(achievement.difficulty)}
         </span>
       </div>
-      <p class="text-xs text-gray-300 mb-2 line-clamp-2">${
-        achievement.description
-      }</p>
+      <p class="text-xs text-gray-300 mb-2 line-clamp-2">${achievement.description}</p>
       <div class="mb-1">
         <div class="w-full bg-gray-700 rounded-full h-1.5">
           <div
             class="bg-yellow-400 h-1.5 rounded-full transition-all duration-300"
-            style="width: ${progressPercent}%"
+            style="width: 100%"
           ></div>
         </div>
         <p class="text-xs text-gray-400 mt-0.5">
           ${currentValue} / ${targetValue}
         </p>
       </div>
-      ${
-        isCompleted
-          ? `<div class="mt-1 pt-1 border-t border-yellow-400/30">
-               <p class="text-xs text-yellow-300 font-semibold">
-                 Bônus: +${achievement.bonus} moedas
-               </p>
-             </div>`
-          : ""
-      }
+      <div class="mt-1 pt-1 border-t border-yellow-400/30">
+        <p class="text-xs text-yellow-300 font-semibold">
+          Bônus: +${achievement.bonus} moedas
+        </p>
+      </div>
     `;
 
     container.appendChild(card);

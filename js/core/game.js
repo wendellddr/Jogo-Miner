@@ -24,6 +24,23 @@ let gameState = {
   powerCooldown: 60,
   powerStartTime: 0,
   lastPowerUse: 0,
+
+  // Sistema de Combo
+  comboCount: 0,
+  lastComboTime: 0,
+  comboMultiplier: 1,
+
+  // Sistema de Auto-Buy
+  autoBuyEnabled: false,
+  autoBuyDelay: 1000, // 1 segundo entre compras
+  lastAutoBuy: 0,
+};
+
+// Configuração de Combo
+const COMBO_CONFIG = {
+  COMBO_TIMEOUT: 2000, // 2 segundos para manter combo
+  COMBO_MULTIPLIER_BASE: 0.05, // 5% por combo
+  COMBO_MAX_MULTIPLIER: 3, // Máximo de 3x
 };
 
 // Upgrades são definidos em upgrades.js
@@ -34,8 +51,16 @@ let saveInterval = null;
 let lastUpdateTime = Date.now();
 let lastScoreSubmission = 0;
 let lastCloudSave = 0;
+let lastUIUpdate = 0;
 const SCORE_SUBMIT_INTERVAL = 60000; // Submete score a cada 1 minuto
 const CLOUD_SAVE_INTERVAL = 30000; // Salva na nuvem a cada 30 segundos
+const UI_UPDATE_INTERVAL = 100; // Atualiza UI no máximo a cada 100ms (10 FPS para UI)
+
+// Cache de cálculos para performance
+let cachedCPS = 0;
+let cachedCPC = 0;
+let cachedCalculationTime = 0;
+const CACHE_DURATION = 1000; // Cache válido por 1 segundo
 
 // --- Funções de Persistência (localStorage) ---
 
@@ -52,6 +77,7 @@ function saveGame() {
       powerStartTime: gameState.powerStartTime,
       lastPowerUse: gameState.lastPowerUse,
       totalCoinsEarned: gameState.totalCoinsEarned || 0, // Salva progresso de mundos
+      autoBuyEnabled: gameState.autoBuyEnabled || false,
       // Adiciona o tempo da última salvamento para calcular ganhos offline
       lastSaveTime: now,
     };
@@ -177,11 +203,15 @@ function showMessage(text, isError = false) {
 }
 
 // Função para criar o texto flutuante de moedas
-function createFloatingCoin(amount, targetElement, isCritical = false) {
+function createFloatingCoin(amount, targetElement, isCritical = false, comboText = "") {
   const coin = document.createElement("div");
   coin.textContent = isCritical
     ? `💥 CRÍTICO! +${formatNumber(amount)}`
     : `+${formatNumber(amount)}`;
+  
+  if (comboText) {
+    coin.textContent += comboText;
+  }
 
   const colorClasses = isCritical
     ? ["text-secondary", "text-5xl"]
@@ -203,7 +233,33 @@ function createFloatingCoin(amount, targetElement, isCritical = false) {
 
   setTimeout(() => {
     coin.remove();
-  }, 1000);
+  }, 1500);
+}
+
+/**
+ * Cria partículas de explosão para efeitos críticos ou grandes
+ */
+function createParticles(count, x, y, color = "#FF5733") {
+  for (let i = 0; i < count; i++) {
+    const particle = document.createElement("div");
+    particle.className = "particle";
+    particle.style.left = `${x}px`;
+    particle.style.top = `${y}px`;
+    particle.style.color = color;
+    
+    // Direção aleatória
+    const angle = (Math.PI * 2 * i) / count;
+    const velocity = 50 + Math.random() * 50;
+    const tx = Math.cos(angle) * velocity;
+    const ty = Math.sin(angle) * velocity;
+    
+    particle.style.setProperty("--tx", `${tx}px`);
+    particle.style.setProperty("--ty", `${ty}px`);
+    
+    document.body.appendChild(particle);
+    
+    setTimeout(() => particle.remove(), 800);
+  }
 }
 
 function updateUI() {
@@ -244,7 +300,19 @@ function updateUI() {
           clickText = theme.texts.clickButton;
         }
       }
-      textSpan.textContent = `${clickText} ( +${formatNumber(currentCPC)} )`;
+      
+      // Formatação compacta para números grandes
+      let cpcDisplay = formatNumber(currentCPC);
+      if (currentCPC >= 1000000) {
+        // Para números muito grandes, usa notação científica curta
+        const formatted = currentCPC >= 1000000000 
+          ? (currentCPC / 1000000000).toFixed(1) + "B"
+          : (currentCPC / 1000000).toFixed(1) + "M";
+        cpcDisplay = formatted;
+      }
+      
+      textSpan.textContent = `${clickText} (+${cpcDisplay})`;
+      textSpan.className = "text-xs sm:text-sm text-center break-words flex-1 min-w-0 leading-tight";
     }
   }
 
@@ -262,6 +330,27 @@ function updateUI() {
   document.getElementById("crit-display").textContent = `Chance de Crítico: ${(
     displayCriticalChance * 100
   ).toFixed(1)}% (x${displayCriticalMultiplier.toFixed(1)})`;
+
+  // Atualiza Display de Combo
+  const comboDisplay = document.getElementById("combo-display");
+  const nowCombo = Date.now();
+  if (gameState.comboCount > 1 && nowCombo - gameState.lastComboTime < COMBO_CONFIG.COMBO_TIMEOUT) {
+    comboDisplay.classList.remove("hidden");
+    document.getElementById("combo-count").textContent = gameState.comboCount;
+    document.getElementById("combo-mult").textContent = gameState.comboMultiplier.toFixed(2);
+  } else {
+    comboDisplay.classList.add("hidden");
+  }
+
+  // Atualiza Status de Auto-Buy (apenas texto do status para evitar conflitos)
+  const autoBuyStatus = document.getElementById("auto-buy-status");
+  if (autoBuyStatus && gameState.autoBuyEnabled !== undefined) {
+    if (gameState.autoBuyEnabled) {
+      autoBuyStatus.textContent = "Comprando upgrades automaticamente!";
+    } else {
+      autoBuyStatus.textContent = "";
+    }
+  }
 
   // Atualiza Status de Power
   const powerButton = document.getElementById("power-button");
@@ -368,16 +457,16 @@ function updateUI() {
 
     // Atualiza Estado Visual (CSS classes e disabled state)
     const cardBaseClasses =
-      "flex items-center justify-between p-4 rounded-xl transition duration-200";
+      "flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl transition duration-200 hover:bg-gray-700/70 border-2 border-transparent";
 
     // Atualiza o display de pré-requisito
     const prereqDisplay = document.getElementById(`prereq-msg-${upgrade.id}`);
 
     if (!canBuy) {
       // Bloqueado por custo OU pré-requisito
-      card.className = `${cardBaseClasses} locked-card bg-gray-700/50`;
+      card.className = `${cardBaseClasses} locked-card bg-gray-700/50 border-gray-700`;
       buyButton.className =
-        "py-2 px-4 rounded-full font-bold text-sm transition duration-150 shadow-md bg-gray-500 cursor-not-allowed text-gray-300";
+        "w-full sm:w-auto py-2.5 px-4 rounded-lg font-bold text-xs sm:text-sm transition duration-150 shadow-md bg-gray-500 cursor-not-allowed text-gray-300 flex-shrink-0 sm:ml-4";
       buyButton.disabled = true;
 
       if (!isPrereqMet && prereqDisplay) {
@@ -388,9 +477,9 @@ function updateUI() {
       }
     } else {
       // Pode Comprar (tem dinheiro E atendeu pré-requisito)
-      card.className = `${cardBaseClasses} afford-glow bg-dark-bg hover:bg-dark-card/70`;
+      card.className = `${cardBaseClasses} afford-glow bg-gray-700/70 border-primary/50`;
       buyButton.className =
-        "py-2 px-4 rounded-full font-bold text-sm transition duration-150 shadow-md bg-green-500 hover:bg-green-600 text-white";
+        "w-full sm:w-auto py-2.5 px-4 rounded-lg font-bold text-xs sm:text-sm transition duration-150 shadow-md bg-green-500 hover:bg-green-600 text-white flex-shrink-0 sm:ml-4";
       buyButton.disabled = false;
       if (prereqDisplay) prereqDisplay.classList.add("hidden");
     }
@@ -399,6 +488,79 @@ function updateUI() {
   // Atualiza barra de progresso do mundo
   if (typeof updateWorldProgress === "function") {
     updateWorldProgress();
+  }
+
+  // Atualiza próximo objetivo
+  updateNextGoal();
+}
+
+/**
+ * Calcula e atualiza o próximo objetivo do jogador
+ */
+function updateNextGoal() {
+  const nextGoalText = document.getElementById("next-goal-text");
+  const progressContainer = document.getElementById("next-goal-progress-container");
+  const progressBar = document.getElementById("next-goal-progress");
+  
+  if (!nextGoalText) return;
+  
+  let goal = "";
+  let progress = 0;
+  let maxProgress = 0;
+  let showProgress = false;
+  
+  // Prioridade 1: Verifica qual upgrade está mais perto de ser comprado
+  let cheapestUnaffordableUpgrade = null;
+  let cheapestCost = Infinity;
+  
+  UPGRADE_DEFINITIONS.forEach((upgrade) => {
+    const cost = calculateCost(upgrade.id);
+    if (cost < cheapestCost && gameState.coins < cost) {
+      cheapestCost = cost;
+      cheapestUnaffordableUpgrade = upgrade;
+    }
+  });
+  
+  if (cheapestUnaffordableUpgrade) {
+    goal = `Comprar ${cheapestUnaffordableUpgrade.icon} ${cheapestUnaffordableUpgrade.name}`;
+    progress = gameState.coins;
+    maxProgress = cheapestCost;
+    showProgress = true;
+  } else if (LOCKED_UPGRADES.length > 0) {
+    // Prioridade 2: Desbloquear próximo upgrade
+    const nextLocked = LOCKED_UPGRADES[0];
+    const currentCPS = gameState.coinsPerSecond;
+    goal = `Desbloquear ${nextLocked.icon} ${nextLocked.name} (${formatNumber(nextLocked.unlockCPS)} CPS)`;
+    progress = currentCPS;
+    maxProgress = nextLocked.unlockCPS;
+    showProgress = true;
+  } else {
+    // Prioridade 3: Avançar para próximo mundo
+    if (typeof getCurrentWorldIndex === "function" && typeof WORLD_ORDER !== "undefined") {
+      const currentIndex = getCurrentWorldIndex();
+      if (currentIndex < WORLD_ORDER.length - 1) {
+        const nextWorld = WORLD_ORDER[currentIndex + 1];
+        goal = `Avançar para ${nextWorld.icon} ${nextWorld.name}`;
+        progress = gameState.totalCoinsEarned || 0;
+        maxProgress = nextWorld.requiredCoins;
+        showProgress = true;
+      } else {
+        goal = "🎉 Você alcançou todos os mundos! Explore as Cavernas!";
+      }
+    } else {
+      goal = "Minere moedas e melhore sua produção!";
+    }
+  }
+  
+  nextGoalText.textContent = goal;
+  
+  // Atualiza barra de progresso
+  if (showProgress && maxProgress > 0) {
+    const percent = Math.min(100, (progress / maxProgress) * 100);
+    progressContainer.style.display = "block";
+    progressBar.style.width = `${percent}%`;
+  } else {
+    progressContainer.style.display = "none";
   }
 }
 
@@ -424,6 +586,13 @@ function calculateCost(upgradeId) {
 }
 
 function calculateTotalCPS() {
+  const now = Date.now();
+  
+  // Verifica cache
+  if (now - cachedCalculationTime < CACHE_DURATION && cachedCPS > 0) {
+    return cachedCPS;
+  }
+  
   let totalCPS = 0;
   // Itera SOMENTE sobre a lista de upgrades ATIVOS
   UPGRADE_DEFINITIONS.forEach((upgrade) => {
@@ -436,6 +605,15 @@ function calculateTotalCPS() {
   // Aplica buffs do inventário
   if (typeof getInventoryCPSMultiplier === "function") {
     totalCPS *= getInventoryCPSMultiplier();
+  }
+  
+  // Bônus extra baseado em itens raros equipados da dungeon
+  if (typeof bagState !== "undefined" && bagState.items) {
+    const rareItemsCount = bagState.items.filter(item => item.rarity === "rare").length;
+    const uncommonItemsCount = bagState.items.filter(item => item.rarity === "uncommon").length;
+    if (rareItemsCount > 0 || uncommonItemsCount > 0) {
+      totalCPS *= 1 + (rareItemsCount * 0.15) + (uncommonItemsCount * 0.05); // +15% por raro, +5% por incomum
+    }
   }
 
   // Aplica multiplicadores de prestígio
@@ -450,10 +628,33 @@ function calculateTotalCPS() {
     totalCPS *= getProceduralCPSMultiplier();
   }
 
+  // Aplica multiplicadores de eventos
+  if (typeof getEventMultipliers === "function") {
+    const eventMults = getEventMultipliers();
+    totalCPS *= eventMults.total;
+    totalCPS *= eventMults.cps;
+  }
+
+  // Aplica multiplicador do mundo
+  if (typeof getWorldBonusMultiplier === "function") {
+    totalCPS *= getWorldBonusMultiplier();
+  }
+
+  // Atualiza cache
+  cachedCPS = totalCPS;
+  cachedCalculationTime = now;
+
   return totalCPS;
 }
 
 function calculateTotalCPC() {
+  const now = Date.now();
+  
+  // Verifica cache
+  if (now - cachedCalculationTime < CACHE_DURATION && cachedCPC > 0) {
+    return cachedCPC;
+  }
+  
   let totalCPC = 1; // Base inicial de 1
   // Itera SOMENTE sobre a lista de upgrades ATIVOS
   UPGRADE_DEFINITIONS.forEach((upgrade) => {
@@ -468,6 +669,15 @@ function calculateTotalCPC() {
   if (typeof getInventoryCPCMultiplier === "function") {
     totalCPC *= getInventoryCPCMultiplier();
   }
+  
+  // Bônus extra baseado em itens raros equipados da dungeon
+  if (typeof bagState !== "undefined" && bagState.items) {
+    const rareItemsCount = bagState.items.filter(item => item.rarity === "rare").length;
+    const uncommonItemsCount = bagState.items.filter(item => item.rarity === "uncommon").length;
+    if (rareItemsCount > 0 || uncommonItemsCount > 0) {
+      totalCPC *= 1 + (rareItemsCount * 0.15) + (uncommonItemsCount * 0.05); // +15% por raro, +5% por incomum
+    }
+  }
 
   // Aplica multiplicadores de prestígio
   if (typeof getPrestigeMultiplier === "function") {
@@ -475,6 +685,22 @@ function calculateTotalCPC() {
     totalCPC *= getPrestigeMultiplier("allEarnings");
     totalCPC *= getPrestigeMultiplier("multiplierBonus");
   }
+
+  // Aplica multiplicadores de eventos
+  if (typeof getEventMultipliers === "function") {
+    const eventMults = getEventMultipliers();
+    totalCPC *= eventMults.total;
+    totalCPC *= eventMults.click;
+  }
+
+  // Aplica multiplicador do mundo
+  if (typeof getWorldBonusMultiplier === "function") {
+    totalCPC *= getWorldBonusMultiplier();
+  }
+
+  // Atualiza cache
+  cachedCPC = totalCPC;
+  cachedCalculationTime = now;
 
   return totalCPC;
 }
@@ -714,8 +940,23 @@ function playUpgradeSound() {
 function clickCoin() {
   gameState.coinsPerClick = calculateTotalCPC();
 
+  // Sistema de Combo
+  const now = Date.now();
+  if (now - gameState.lastComboTime < COMBO_CONFIG.COMBO_TIMEOUT) {
+    gameState.comboCount++;
+    const comboBonus = gameState.comboCount * COMBO_CONFIG.COMBO_MULTIPLIER_BASE;
+    gameState.comboMultiplier = 1 + Math.min(comboBonus, COMBO_CONFIG.COMBO_MAX_MULTIPLIER - 1);
+  } else {
+    gameState.comboCount = 1;
+    gameState.comboMultiplier = 1 + COMBO_CONFIG.COMBO_MULTIPLIER_BASE;
+  }
+  gameState.lastComboTime = now;
+
   let earnedAmount = gameState.coinsPerClick;
   let isCritical = false;
+
+  // Aplica multiplicador de combo
+  earnedAmount *= gameState.comboMultiplier;
 
   if (gameState.powerActive) {
     earnedAmount *= gameState.powerMultiplier;
@@ -742,6 +983,11 @@ function clickCoin() {
   if (typeof getPrestigeMultiplier === "function") {
     criticalChance *= getPrestigeMultiplier("criticalChance");
   }
+  // Aplica multiplicadores de eventos
+  if (typeof getEventMultipliers === "function") {
+    const eventMults = getEventMultipliers();
+    criticalChance += eventMults.criticalChance;
+  }
 
   if (Math.random() < criticalChance) {
     // Aplica multiplicador crítico com buffs do inventário
@@ -756,13 +1002,8 @@ function clickCoin() {
     if (typeof trackCriticalHit === "function") {
       trackCriticalHit();
     }
-  }
-
-  // Tenta dropar item
-  if (typeof tryDropItem === "function") {
-    const droppedItem = tryDropItem();
-    if (droppedItem && typeof addItemToInventory === "function") {
-      addItemToInventory(droppedItem);
+    if (typeof trackStatsCritical === "function") {
+      trackStatsCritical();
     }
   }
 
@@ -778,13 +1019,20 @@ function clickCoin() {
   if (typeof trackClick === "function") {
     trackClick();
   }
+  if (typeof trackStatsClick === "function") {
+    trackStatsClick();
+  }
 
   // Rastreia moedas acumuladas
   if (typeof trackCoins === "function") {
     trackCoins(gameState.coins);
   }
+  if (typeof trackStatsCoins === "function") {
+    trackStatsCoins(gameState.coins);
+  }
 
   const clickButton = document.getElementById("click-button");
+  const rect = clickButton.getBoundingClientRect();
 
   // Toca o som de picareta
   playMiningSound();
@@ -796,10 +1044,40 @@ function clickCoin() {
     }, 50); // Pequeno delay para o som de moeda vir depois do impacto
   }
 
-  createFloatingCoin(earnedAmount, clickButton, isCritical);
+  // Mostra feedback visual de combo
+  let comboText = "";
+  if (gameState.comboCount >= 5) {
+    comboText = ` 🔥 COMBO x${gameState.comboCount}! 🔥`;
+  }
+  
+  createFloatingCoin(earnedAmount, clickButton, isCritical, comboText);
 
-  clickButton.classList.add("animate-pulse");
-  setTimeout(() => clickButton.classList.remove("animate-pulse"), 100);
+  // Efeitos visuais aprimorados
+  if (isCritical) {
+    // Shake forte para crítico
+    clickButton.classList.add("critical-hit");
+    setTimeout(() => clickButton.classList.remove("critical-hit"), 700);
+    
+    // Partículas de explosão
+    createParticles(12, rect.left + rect.width / 2, rect.top + rect.height / 2, "#FF5733");
+  } else {
+    // Pulse simples para cliques normais
+    clickButton.classList.add("animate-pulse");
+    setTimeout(() => clickButton.classList.remove("animate-pulse"), 100);
+  }
+  
+  // Efeitos especiais para combos
+  if (gameState.comboCount >= 10) {
+    // Combo MASSIVO
+    createParticles(20, rect.left + rect.width / 2, rect.top + rect.height / 2, "#FFD700");
+    clickButton.classList.add("animate-pulse-glow");
+    setTimeout(() => clickButton.classList.remove("animate-pulse-glow"), 300);
+  } else if (gameState.comboCount >= 5) {
+    // Combo bom
+    createParticles(8, rect.left + rect.width / 2, rect.top + rect.height / 2, "#FF4500");
+    clickButton.classList.add("animate-pulse-glow");
+    setTimeout(() => clickButton.classList.remove("animate-pulse-glow"), 200);
+  }
 
   updateUI();
 }
@@ -857,6 +1135,11 @@ function buyUpgrade(upgradeId) {
 
     gameState.upgradeLevels[upgradeId] = getUpgradeLevel(upgradeId) + 1;
 
+    // Invalida cache
+    cachedCPS = 0;
+    cachedCPC = 0;
+    cachedCalculationTime = 0;
+
     // Recalcula todos os stats
     gameState.coinsPerSecond = calculateTotalCPS();
     gameState.coinsPerClick = calculateTotalCPC();
@@ -865,9 +1148,19 @@ function buyUpgrade(upgradeId) {
     if (typeof trackUpgradeBought === "function") {
       trackUpgradeBought();
     }
+    if (typeof trackStatsUpgrade === "function") {
+      trackStatsUpgrade();
+    }
 
     // Toca o som de upgrade
     playUpgradeSound();
+    
+    // Efeito visual no card do upgrade comprado
+    const card = document.getElementById(`upgrade-card-${upgradeId}`);
+    if (card) {
+      card.classList.add("animate-upgrade-purchase");
+      setTimeout(() => card.classList.remove("animate-upgrade-purchase"), 400);
+    }
 
     updateUI();
     saveGame(); // Salva ao comprar
@@ -918,6 +1211,44 @@ function checkNewUpgrades() {
   }
 }
 
+/**
+ * Compra automaticamente o melhor upgrade disponível
+ */
+function autoBuyBestUpgrade() {
+  let bestUpgrade = null;
+  let bestRatio = 0;
+  
+  // Encontra o upgrade com melhor relação custo/benefício
+  UPGRADE_DEFINITIONS.forEach((upgrade) => {
+    const cost = calculateCost(upgrade.id);
+    
+    // Verifica se pode comprar
+    if (gameState.coins >= cost) {
+      // Verifica pré-requisitos
+      if (upgrade.prerequisite) {
+        const requiredLevel = upgrade.prerequisite.level;
+        const currentLevel = getUpgradeLevel(upgrade.prerequisite.id);
+        if (currentLevel < requiredLevel) {
+          return; // Pula este upgrade
+        }
+      }
+      
+      // Calcula eficiência (ganho por moeda gasta)
+      const efficiency = upgrade.baseGain / cost;
+      
+      if (efficiency > bestRatio) {
+        bestRatio = efficiency;
+        bestUpgrade = upgrade;
+      }
+    }
+  });
+  
+  // Compra o melhor upgrade encontrado
+  if (bestUpgrade) {
+    buyUpgrade(bestUpgrade.id);
+  }
+}
+
 function gameLoop() {
   const now = Date.now();
   const deltaTime = (now - lastUpdateTime) / 1000;
@@ -948,7 +1279,23 @@ function gameLoop() {
     trackCPS(currentCPS);
   }
 
-  updateUI();
+  // Atualiza UI dos eventos procedural (a cada segundo aproximadamente)
+  if (now % 1000 < 100 && typeof renderProceduralUI === "function") {
+    renderProceduralUI();
+    updateActiveEventsIndicator();
+  }
+
+  // Sistema de Auto-Buy (compra automaticamente o melhor upgrade)
+  if (gameState.autoBuyEnabled && now - gameState.lastAutoBuy >= gameState.autoBuyDelay) {
+    autoBuyBestUpgrade();
+    gameState.lastAutoBuy = now;
+  }
+
+  // Atualiza UI com throttling para melhor performance
+  if (now - lastUIUpdate >= UI_UPDATE_INTERVAL) {
+    updateUI();
+    lastUIUpdate = now;
+  }
 }
 
 /**
@@ -1020,29 +1367,34 @@ function renderUpgradeCard(upgrade, container, isLocked = false) {
   } else {
     // Renderização para item ATIVO (Comprável)
     card.className =
-      "flex items-center justify-between p-4 rounded-xl transition duration-200 bg-gray-700/50";
+      "flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl transition duration-200 bg-gray-700/50 hover:bg-gray-700/70 border-2 border-transparent";
     card.innerHTML = `
-            <div class="flex items-center space-x-4">
-                <span class="text-4xl">${upgradeIcon}</span>
-                <div>
-                    <p class="text-xl font-semibold">${
-                      upgrade.name
-                    } (Nível <span id="count-${upgrade.id}">${level}</span>)</p>
-                    <p class="text-sm text-gray-400">${upgrade.description}</p>
-                    <p class="text-sm text-green-400">Ganha ${formatNumber(
-                      upgrade.baseGain
-                    )} ${gainTextType} por nível</p>
-                     <!-- Mensagem de Pré-requisito (visível apenas se não atendido) -->
-                    <p id="prereq-msg-${
-                      upgrade.id
-                    }" class="text-xs font-semibold text-secondary mt-1 hidden"></p>
+            <div class="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 mb-3 sm:mb-0">
+                <span class="text-3xl sm:text-4xl flex-shrink-0">${upgradeIcon}</span>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center flex-wrap gap-2">
+                        <p class="text-base sm:text-lg font-semibold">${
+                          upgrade.name
+                        }</p>
+                        <span class="text-xs sm:text-sm bg-primary/20 text-primary px-2 py-0.5 rounded">Nível <span id="count-${upgrade.id}">${level}</span></span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-400 mt-1 line-clamp-2">${upgrade.description}</p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <p class="text-xs sm:text-sm text-green-400 font-semibold">+${formatNumber(
+                          upgrade.baseGain
+                        )} ${gainTextType}/nível</p>
+                        <!-- Mensagem de Pré-requisito -->
+                        <p id="prereq-msg-${
+                          upgrade.id
+                        }" class="text-xs font-semibold text-secondary hidden"></p>
+                    </div>
                 </div>
             </div>
             <button id="buy-btn-${upgrade.id}" 
                     data-upgrade-id="${upgrade.id}" 
-                    class="py-2 px-4 rounded-full font-bold text-sm transition duration-150 shadow-md bg-gray-500 cursor-not-allowed text-gray-300"
-                    disabled>
-                Comprar (<span id="cost-${upgrade.id}">0.00</span> Moedas)
+                    class="w-full sm:w-auto py-2.5 px-4 rounded-lg font-bold text-xs sm:text-sm transition duration-150 shadow-md bg-gray-500 cursor-not-allowed text-gray-300 flex-shrink-0 sm:ml-4">
+                <span class="block sm:inline">Comprar</span>
+                <span class="block sm:inline">(<span id="cost-${upgrade.id}">0.00</span>)</span>
             </button>
         `;
   }
@@ -1064,10 +1416,22 @@ function updateWorldProgress() {
     const progressBar = document.getElementById("world-progress-bar");
     const progressText = document.getElementById("world-progress-text");
     const worldName = document.getElementById("current-world-name");
+    const worldBonus = document.getElementById("world-bonus");
+    const worldDescription = document.getElementById("world-description");
+    const worldPercent = document.getElementById("world-percent");
     const advanceButton = document.getElementById("advance-world-button");
 
     if (worldName) {
-      worldName.textContent = `Mundo: ${currentWorld.name}`;
+      worldName.textContent = `🌍 Mundo: ${currentWorld.name}`;
+    }
+
+    if (worldBonus && typeof getWorldBonusMultiplier === "function") {
+      const multiplier = getWorldBonusMultiplier();
+      worldBonus.textContent = `x${multiplier.toFixed(1)}`;
+    }
+
+    if (worldDescription && typeof getWorldDescription === "function") {
+      worldDescription.textContent = getWorldDescription(currentWorld.id);
     }
 
     if (progressBar) {
@@ -1084,6 +1448,10 @@ function updateWorldProgress() {
       }
     }
 
+    if (worldPercent) {
+      worldPercent.textContent = `${Math.floor(progress.percent)}%`;
+    }
+
     if (advanceButton) {
       if (
         progress.hasNext &&
@@ -1093,7 +1461,7 @@ function updateWorldProgress() {
         advanceButton.classList.remove("hidden");
         const nextWorld = getNextWorld();
         if (nextWorld) {
-          advanceButton.textContent = `🌍 Avançar para ${nextWorld.name}`;
+          advanceButton.textContent = `🌍 Avançar para ${nextWorld.name} (x${nextWorld.bonusMultiplier.toFixed(1)})`;
         }
       } else {
         advanceButton.classList.add("hidden");
@@ -1160,9 +1528,19 @@ function startGame(loadSave = true) {
     initializeProcedural();
   }
 
+  // Inicializa sistema de dungeon
+  if (typeof initializeDungeon === "function") {
+    initializeDungeon();
+  }
+
   // Inicializa menu de navegação
   if (typeof initializeGameMenu === "function") {
     initializeGameMenu();
+  }
+  
+  // Inicializa sistema de estatísticas
+  if (typeof initializeStats === "function") {
+    initializeStats();
   }
 
   // Se for novo jogo, reseta o estado
@@ -1181,6 +1559,12 @@ function startGame(loadSave = true) {
       powerStartTime: 0,
       lastPowerUse: 0,
       totalCoinsEarned: 0, // Inicia com 0 para progresso de mundos
+      comboCount: 0,
+      lastComboTime: 0,
+      comboMultiplier: 1,
+      autoBuyEnabled: false,
+      autoBuyDelay: 1000,
+      lastAutoBuy: 0,
       inventoryBuffs: {
         cpc_multiplier: 1,
         cps_multiplier: 1,
@@ -1201,6 +1585,13 @@ function startGame(loadSave = true) {
   // Garante que totalCoinsEarned existe
   if (gameState.totalCoinsEarned === undefined) {
     gameState.totalCoinsEarned = gameState.coins || 0;
+  }
+  
+  // Garante que auto-buy existe
+  if (gameState.autoBuyEnabled === undefined) {
+    gameState.autoBuyEnabled = false;
+    gameState.autoBuyDelay = 1000;
+    gameState.lastAutoBuy = 0;
   }
 
   // Renderiza a estrutura inicial dos upgrades
@@ -1226,22 +1617,55 @@ function startGame(loadSave = true) {
     saveInterval = setInterval(saveGame, 60000); // Salva a cada 60 segundos
   }
 
-  // Adiciona listener do botão principal
-  document.getElementById("click-button").addEventListener("click", () => {
-    // Inicializa o contexto de áudio na primeira interação
-    initAudioContext();
-    clickCoin();
-  });
+  // Previne múltiplas inicializações
+  if (!window.gameInitialized) {
+    window.gameInitialized = true;
+    
+    // Adiciona listener do botão principal
+    document.getElementById("click-button").addEventListener("click", (e) => {
+      // Inicializa o contexto de áudio na primeira interação
+      initAudioContext();
+      
+      clickCoin();
+    });
+    
+    // Adiciona o listener delegado ao container pai dos upgrades.
+    document
+      .getElementById("upgrades-container")
+      .addEventListener("click", handleUpgradeClick);
 
-  // Adiciona o listener delegado ao container pai dos upgrades.
-  document
-    .getElementById("upgrades-container")
-    .addEventListener("click", handleUpgradeClick);
+    // Adiciona listener do botão de poder
+    document
+      .getElementById("power-button")
+      .addEventListener("click", activatePower);
 
-  // Adiciona listener do botão de poder
-  document
-    .getElementById("power-button")
-    .addEventListener("click", activatePower);
+    // Adiciona listener do botão de auto-buy
+    document
+      .getElementById("auto-buy-button")
+      .addEventListener("click", () => {
+        gameState.autoBuyEnabled = !gameState.autoBuyEnabled;
+        const button = document.getElementById("auto-buy-button");
+        const status = document.getElementById("auto-buy-status");
+        
+        if (gameState.autoBuyEnabled) {
+          button.textContent = "🤖 Auto-Comprar: ON";
+          button.classList.remove("bg-green-600", "hover:bg-green-700");
+          button.classList.add("bg-green-500", "animate-pulse");
+          if (status) status.textContent = "Comprando upgrades automaticamente!";
+          if (typeof showMessage === "function") {
+            showMessage("🤖 Auto-Compra ativado! O jogo vai evoluir sozinho!", false);
+          }
+        } else {
+          button.textContent = "🤖 Auto-Comprar: OFF";
+          button.classList.remove("bg-green-500", "animate-pulse");
+          button.classList.add("bg-green-600", "hover:bg-green-700");
+          if (status) status.textContent = "";
+          if (typeof showMessage === "function") {
+            showMessage("⏸️ Auto-Compra desativado", true);
+          }
+        }
+      });
+  }
 
   // Adiciona listener para o botão de avançar mundo
   const advanceButton = document.getElementById("advance-world-button");
@@ -1266,4 +1690,21 @@ function startGame(loadSave = true) {
       startBackgroundMusic();
     }
   }
+}
+
+/**
+ * Atualiza indicador de eventos ativos no header
+ */
+function updateActiveEventsIndicator() {
+  const indicator = document.getElementById("active-events-indicator");
+  if (!indicator) return;
+  
+  if (typeof getEventMultipliers === "undefined" || typeof getEventMultipliers !== "function") {
+    return;
+  }
+  
+  // Não tenta acessar activeEvents diretamente pois está em outro arquivo
+  // A função renderProceduralUI já atualiza os eventos na sidebar
+  // Este indicador no header poderia mostrar um resumo simples
+  indicator.classList.add("hidden"); // Por enquanto, oculto
 }

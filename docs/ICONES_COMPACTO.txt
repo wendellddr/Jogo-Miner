@@ -1,0 +1,135 @@
+═══════════════════════════════════════════════════════════════
+📋 LISTA COMPACTA DE ÍCONES - GAME MINER
+═══════════════════════════════════════════════════════════════
+
+🎁 ITENS MÁGICOS
+═══════════════════════════════════════════════════════════════
+
+🟢 gem_power
+🔵 crystal_strength
+💠 diamond_might
+⚡ speed_crystal
+⏰ time_gem
+♾️ infinity_stone
+🎯 crit_charm
+🍀 lucky_clover
+🎲 fate_dice
+💍 power_ring
+🔮 chaos_orb
+🧲 coin_magnet
+✨ multiplier_gem
+
+═══════════════════════════════════════════════════════════════
+⚔️ ITENS RPG - ARMADURAS
+═══════════════════════════════════════════════════════════════
+
+🧶 leather_armor
+🛡️ chain_mail
+⛑️ leather_helm
+🥊 gauntlets
+🛡️ steel_plate
+🛡️ mithril_armor
+🪖 knights_helm
+🐉 dragon_scale
+🛡️ demonic_plate
+👑 crown_of_kings
+💪 power_gauntlets
+🛡️ paladin_armor
+🛡️ berserker_armor
+
+═══════════════════════════════════════════════════════════════
+🗡️ ITENS RPG - ARMAS (ESPADAS)
+═══════════════════════════════════════════════════════════════
+
+🗡️ iron_sword
+🗡️ bronze_sword
+⚔️ steel_blade
+🗡️ mithril_sword
+🗡️ legendary_sword
+⚔️ excalibur
+
+═══════════════════════════════════════════════════════════════
+🪓 ITENS RPG - MACHADOS
+═══════════════════════════════════════════════════════════════
+
+🪓 iron_axe
+🪓 war_axe
+🪓 dragonslayer_axe
+
+═══════════════════════════════════════════════════════════════
+🏹 ITENS RPG - ARCOS
+═══════════════════════════════════════════════════════════════
+
+🏹 oak_bow
+🏹 longbow
+🏹 elven_bow
+🏹 crossbow
+🏹 dragonslayer_bow
+
+═══════════════════════════════════════════════════════════════
+🛡️ ITENS RPG - ESCUDOS
+═══════════════════════════════════════════════════════════════
+
+🛡️ wooden_shield
+🛡️ iron_shield
+🛡️ steel_shield
+🛡️ tower_shield
+🛡️ aegis_shield
+
+═══════════════════════════════════════════════════════════════
+🔱 ITENS RPG - LANÇAS
+═══════════════════════════════════════════════════════════════
+
+🔱 spear
+🔱 trident
+
+═══════════════════════════════════════════════════════════════
+🔨 ITENS RPG - MARTELOS
+═══════════════════════════════════════════════════════════════
+
+🔨 war_hammer
+🔨 mjolnir
+
+═══════════════════════════════════════════════════════════════
+🧙 ITENS RPG - ACESSÓRIOS
+═══════════════════════════════════════════════════════════════
+
+🧙 mage_cloak
+🦇 shadow_cloak
+💍 ring_of_power
+💍 one_ring
+💍 knights_ring
+
+═══════════════════════════════════════════════════════════════
+👢 ITENS RPG - BOTAS
+═══════════════════════════════════════════════════════════════
+
+👢 travelers_boots
+👢 winged_boots
+
+═══════════════════════════════════════════════════════════════
+👾 MONSTROS DAS CAVERNAS
+═══════════════════════════════════════════════════════════════
+
+👺 goblin
+💀 skeleton
+🧟 zombie
+🧌 troll
+👹 orc
+🧛 vampire
+😈 demon
+🐉 dragon
+👹 boss
+
+═══════════════════════════════════════════════════════════════
+📊 RESUMO
+═══════════════════════════════════════════════════════════════
+
+Total de Ícones: 69
+├─ Itens: 60
+│  ├─ Mágicos: 13
+│  └─ RPG: 47
+└─ Monstros: 9
+
+═══════════════════════════════════════════════════════════════
+

@@ -133,6 +133,11 @@ function performPrestige() {
   prestigeState.totalPrestiges++;
   prestigeState.prestigePoints += pointsGained;
   prestigeState.totalPrestigePoints += pointsGained;
+  
+  // Rastreia prestígio
+  if (typeof trackStatsPrestige === "function") {
+    trackStatsPrestige();
+  }
 
   // Reseta progresso (mas mantém itens e conquistas)
   if (gameState) {

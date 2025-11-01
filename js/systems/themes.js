@@ -11,15 +11,15 @@ let currentWorld = "green"; // Começa no mundo Natureza
 
 // --- Ordem dos Mundos e Requisitos ---
 const WORLD_ORDER = [
-  { id: "green", name: "Natureza", requiredCoins: 0 }, // Mundo inicial
-  { id: "blue", name: "Oceano", requiredCoins: 10000 },
-  { id: "purple", name: "Mágico", requiredCoins: 50000 },
-  { id: "neon", name: "Neon", requiredCoins: 200000 },
-  { id: "pink", name: "Rosa", requiredCoins: 500000 },
-  { id: "red", name: "Fogo", requiredCoins: 2000000 },
-  { id: "dark", name: "Escuro", requiredCoins: 10000000 },
-  { id: "cyberpunk", name: "Cyberpunk", requiredCoins: 50000000 },
-  { id: "default", name: "Ouro", requiredCoins: 200000000 }, // Mundo final
+  { id: "green", name: "Natureza", requiredCoins: 0, bonusMultiplier: 1.0 }, // Mundo inicial
+  { id: "blue", name: "Oceano", requiredCoins: 10000, bonusMultiplier: 1.2 },
+  { id: "purple", name: "Mágico", requiredCoins: 50000, bonusMultiplier: 1.5 },
+  { id: "neon", name: "Neon", requiredCoins: 200000, bonusMultiplier: 2.0 },
+  { id: "pink", name: "Rosa", requiredCoins: 500000, bonusMultiplier: 2.5 },
+  { id: "red", name: "Fogo", requiredCoins: 2000000, bonusMultiplier: 3.0 },
+  { id: "dark", name: "Escuro", requiredCoins: 10000000, bonusMultiplier: 4.0 },
+  { id: "cyberpunk", name: "Cyberpunk", requiredCoins: 50000000, bonusMultiplier: 5.0 },
+  { id: "default", name: "Ouro", requiredCoins: 200000000, bonusMultiplier: 10.0 }, // Mundo final
 ];
 
 /**
@@ -36,6 +36,34 @@ function getCurrentWorldIndex() {
  */
 function getCurrentWorld() {
   return WORLD_ORDER.find((w) => w.id === currentWorld) || WORLD_ORDER[0];
+}
+
+/**
+ * Obtém o multiplicador de bonus do mundo atual
+ * @returns {number} Multiplicador de bonus
+ */
+function getWorldBonusMultiplier() {
+  const world = getCurrentWorld();
+  return world ? world.bonusMultiplier : 1.0;
+}
+
+/**
+ * Obtém descrição do mundo atual
+ * @returns {string} Descrição do mundo
+ */
+function getWorldDescription(worldId) {
+  const descriptions = {
+    green: "🌿 Mundo natural e pacífico. Perfeito para começar sua jornada de mineração.",
+    blue: "🌊 Águas cristalinas guardam tesouros submersos. Multiplicador: x1.2",
+    purple: "✨ Realidade permeada por magia. Multiplicador: x1.5",
+    neon: "🌈 Luzes neon pulsam com energia quântica. Multiplicador: x2.0",
+    pink: "💖 Amor e doçura permeiam este mundo especial. Multiplicador: x2.5",
+    red: "🔥 Calor intenso forja ouro nas entranhas da terra. Multiplicador: x3.0",
+    dark: "🌙 Profundezas sombrias escondem riquezas imensuráveis. Multiplicador: x4.0",
+    cyberpunk: "🤖 Tecnologia extrema modifica a realidade. Multiplicador: x5.0",
+    default: "✨ Lendário mundo dourado. Multiplicador: x10.0",
+  };
+  return descriptions[worldId] || descriptions.green;
 }
 
 /**
@@ -105,8 +133,26 @@ function advanceToNextWorld() {
   saveWorld();
   applyTheme(currentWorld);
 
+  // Rastreia mundo completado
+  if (typeof trackStatsWorldComplete === "function") {
+    trackStatsWorldComplete();
+  }
+  
+  // Adiciona efeito visual especial
+  const gameContent = document.getElementById("game-content");
+  if (gameContent) {
+    gameContent.classList.add("world-transition-animation");
+    setTimeout(() => gameContent.classList.remove("world-transition-animation"), 800);
+  }
+
   if (typeof showMessage === "function") {
-    showMessage(`🌍 Mundo desbloqueado: ${nextWorld.name}!`, false);
+    const bonusText = nextWorld.bonusMultiplier ? ` (Multiplicador: x${nextWorld.bonusMultiplier.toFixed(1)})` : "";
+    showMessage(`🌍✨ Mundo desbloqueado: ${nextWorld.name}${bonusText}! 🌟`, false);
+  }
+
+  // Toca som especial
+  if (typeof playUpgradeSound === "function") {
+    playUpgradeSound();
   }
 
   return true;

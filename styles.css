@@ -1,22 +1,48 @@
 /* Estilos do Jogo - Minerador de Moedas */
 
 body {
-  background-color: #1a1a2e;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #ffffff;
   font-family: "Inter", sans-serif;
   min-height: 100vh;
+  /* Efeito pixelado */
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
-/* Estilo para o botão principal */
+/* Estilo para o botão principal - Pixel Art*/
 .click-button {
   transition: all 0.1s;
   box-shadow: 0 10px 0 #e6a500;
+  border-radius: 0 !important;
+  font-family: "Press Start 2P", cursive;
+  image-rendering: pixelated;
 }
 
 .click-button:active {
   box-shadow: 0 3px 0 #e6a500;
   transform: translateY(7px);
 }
+
+/* Efeito Pixel Art para botões principais - DESABILITADO POR ENQUANTO
+button.click-button,
+button[class*="power-button"],
+#click-button {
+  border-radius: 4px !important;
+  font-family: "Press Start 2P", cursive;
+  font-size: 8px !important;
+  letter-spacing: 0.5px;
+  image-rendering: pixelated;
+}
+*/
+
+/* Títulos pixelados - Desabilitado para não quebrar layout
+h1, h2, h3 {
+  font-family: "Press Start 2P", cursive !important;
+  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5);
+}
+*/
 
 /* Estilização para mensagens temporárias */
 .message-box {
@@ -36,15 +62,23 @@ body {
   /* Inicia a animação float-up */
   animation: float-up 1s ease-out forwards;
   white-space: nowrap; /* Garante que o texto não quebre */
+  text-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.8),
+    0 0 20px currentColor;
+  filter: drop-shadow(0 0 10px currentColor);
 }
 
 @keyframes float-up {
   0% {
-    transform: translate(-50%, 0) scale(1);
+    transform: translate(-50%, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50px) scale(1.2) rotate(5deg);
     opacity: 1;
   }
   100% {
-    transform: translate(-50%, -100px) scale(0.8);
+    transform: translate(-50%, -120px) scale(0.8) rotate(-5deg);
     opacity: 0;
   }
 }
@@ -64,7 +98,7 @@ body {
 
 /* Estilos para cards de conquistas */
 .achievement-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
 }
 
 .achievement-card:hover {
@@ -86,6 +120,24 @@ body {
   100% {
     transform: scale(1);
   }
+}
+
+/* Animação de revelação para conquistas desbloqueadas */
+@keyframes reveal-achievement {
+  0% {
+    filter: blur(10px);
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.achievement-card:not(.blur-sm) {
+  animation: reveal-achievement 0.8s ease-out;
 }
 
 /* Classe para truncar texto em múltiplas linhas */
@@ -243,4 +295,620 @@ body {
 
 .animate-fade-in {
   animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Pixel Art - Cards com bordas pixeladas */
+.pixel-card {
+  border: 4px solid rgba(0, 0, 0, 0.3) !important;
+  border-radius: 0 !important;
+  box-shadow: 
+    4px 4px 0px rgba(0, 0, 0, 0.5),
+    inset 0 0 20px rgba(255, 255, 255, 0.05) !important;
+  position: relative;
+}
+
+.pixel-card::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 2px solid rgba(255, 195, 0, 0.4);
+  border-style: dashed;
+  pointer-events: none;
+  animation: border-pulse 2s infinite;
+}
+
+@keyframes border-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Efeito Glitch para título principal */
+@keyframes glitch {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+}
+
+.glitch-effect {
+  animation: glitch 3s infinite;
+  position: relative;
+}
+
+.glitch-effect::before,
+.glitch-effect::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch-effect::before {
+  left: 2px;
+  text-shadow: -2px 0 #ff00ff;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch-effect::after {
+  left: -2px;
+  text-shadow: -2px 0 #00ffff;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 1s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% {
+    clip: rect(10px, 9999px, 20px, 0);
+  }
+  20% {
+    clip: rect(20px, 9999px, 30px, 0);
+  }
+  40% {
+    clip: rect(30px, 9999px, 40px, 0);
+  }
+  60% {
+    clip: rect(40px, 9999px, 50px, 0);
+  }
+  80% {
+    clip: rect(50px, 9999px, 60px, 0);
+  }
+  100% {
+    clip: rect(60px, 9999px, 70px, 0);
+  }
+}
+
+/* Efeito de scanlines (linhas de CRT) */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.3;
+}
+
+
+/* Animações pulsantes para valores */
+.pulse-value {
+  animation: pulse-color 2s infinite;
+}
+
+@keyframes pulse-color {
+  0%, 100% {
+    color: #FFC300;
+    text-shadow: 0 0 10px #FFC300;
+  }
+  50% {
+    color: #FF6B6B;
+    text-shadow: 0 0 15px #FF6B6B;
+  }
+}
+
+/* Borda neon para elementos ativos */
+.neon-border {
+  box-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor,
+    inset 0 0 20px rgba(255, 255, 255, 0.05) !important;
+  animation: neon-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes neon-pulse {
+  from {
+    box-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor,
+      inset 0 0 20px rgba(255, 255, 255, 0.05);
+  }
+  to {
+    box-shadow: 
+      0 0 10px currentColor,
+      0 0 20px currentColor,
+      0 0 30px currentColor,
+      inset 0 0 30px rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Fonte retro para números grandes - Ajustado */
+#coins-display {
+  font-family: "Press Start 2P", cursive !important;
+  font-size: 2rem !important;
+  text-shadow: 
+    3px 3px 0px #000,
+    0 0 20px rgba(255, 195, 0, 0.8);
+  letter-spacing: 1px;
+}
+
+@media (max-width: 640px) {
+  #coins-display {
+    font-size: 1.5rem !important;
+  }
+  
+  .click-button {
+    min-height: 48px !important;
+    font-size: 0.75rem !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+  
+  .click-button span {
+    font-size: 1.25rem !important;
+  }
+  
+  .floating-coin {
+    font-size: 0.875rem !important;
+  }
+  
+  /* Melhor leitura em mobile */
+  body {
+    padding: 0.5rem !important;
+  }
+  
+  .pixel-card {
+    padding: 1rem !important;
+  }
+  
+  /* Ajustes para indicador de próximo objetivo */
+  #next-goal-indicator {
+    padding: 0.75rem !important;
+  }
+  
+  #next-goal-text {
+    font-size: 0.875rem !important;
+  }
+  
+  /* Ajustes para botões */
+  #power-button,
+  #auto-buy-button {
+    font-size: 0.75rem !important;
+    padding: 0.5rem !important;
+  }
+}
+
+/* Cards com efeito de profundidade pixelado */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.2s;
+}
+
+.card-3d:hover {
+  transform: rotateX(5deg) rotateY(5deg) translateZ(10px);
+}
+
+/* Efeitos de Shake para feedback visual */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes shake-strong {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  10% { transform: translateX(-10px) translateY(-3px); }
+  20% { transform: translateX(10px) translateY(3px); }
+  30% { transform: translateX(-8px) translateY(-2px); }
+  40% { transform: translateX(8px) translateY(2px); }
+  50% { transform: translateX(-5px) translateY(-1px); }
+  60% { transform: translateX(5px) translateY(1px); }
+  70% { transform: translateX(-3px) translateY(-1px); }
+  80% { transform: translateX(3px) translateY(1px); }
+  90% { transform: translateX(-2px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.animate-shake-strong {
+  animation: shake-strong 0.7s ease-in-out;
+}
+
+/* Efeito de brilho pulsante para elementos importantes */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Efeito de zoom in/out para upgrades comprados */
+@keyframes upgrade-purchase {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); filter: brightness(1.5); }
+  100% { transform: scale(1); }
+}
+
+.animate-upgrade-purchase {
+  animation: upgrade-purchase 0.4s ease-out;
+}
+
+/* Partículas de explosão para críticos */
+@keyframes particle-float {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0);
+    opacity: 0;
+  }
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: currentColor;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: particle-float 0.8s ease-out forwards;
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* Efeito de splash para moedas */
+@keyframes coin-splash {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(360deg);
+    opacity: 0.8;
+  }
+}
+
+.animate-coin-splash {
+  animation: coin-splash 0.6s ease-out;
+}
+
+/* Efeito de tremor crítico */
+.critical-hit {
+  animation: shake-strong 0.7s ease-in-out, pulse-glow 0.7s ease-in-out;
+}
+
+/* Borda brilhante para upgrades afetados */
+.upgrade-buff-effect {
+  border: 3px solid #FFD700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), inset 0 0 20px rgba(255, 215, 0, 0.3);
+  animation: upgrade-buff-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes upgrade-buff-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), inset 0 0 20px rgba(255, 215, 0, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 1), inset 0 0 30px rgba(255, 215, 0, 0.5);
+    transform: scale(1.02);
+  }
+}
+
+/* Efeito de "pop" para números grandes */
+@keyframes number-pop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3) rotate(5deg); }
+}
+
+.animate-number-pop {
+  animation: number-pop 0.3s ease-out;
+}
+
+/* Efeito de nível up */
+@keyframes level-up {
+  0% {
+    transform: scale(1) translateY(0);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.2) translateY(-20px);
+    filter: brightness(1.8);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    filter: brightness(1);
+  }
+}
+
+.animate-level-up {
+  animation: level-up 0.6s ease-out;
+}
+
+/* Efeito de transição suave para mudanças de mundo */
+@keyframes world-transition {
+  0% {
+    filter: blur(0px) brightness(1);
+    opacity: 1;
+  }
+  50% {
+    filter: blur(3px) brightness(0.7);
+    opacity: 0.8;
+  }
+  100% {
+    filter: blur(0px) brightness(1);
+    opacity: 1;
+  }
+}
+
+.world-transition-animation {
+  animation: world-transition 0.8s ease-in-out;
+}
+
+/* Efeito de respiração para elementos ativos */
+@keyframes breathing {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 currentColor;
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px 5px currentColor;
+  }
+}
+
+.animate-breathing {
+  animation: breathing 2s ease-in-out infinite;
+}
+
+/* Loading spinner melhorado */
+@keyframes spin-glow {
+  0% { 
+    transform: rotate(0deg);
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+  100% { 
+    transform: rotate(360deg);
+    filter: brightness(1);
+  }
+}
+
+.animate-spin-glow {
+  animation: spin-glow 1s linear infinite;
+}
+
+/* Animação de entrada para inventário */
+@keyframes inventory-slide-in {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Animação para itens do inventário */
+@keyframes inventory-item-appear {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.inventory-sidebar-entering {
+  animation: inventory-slide-in 0.4s ease-out;
+}
+
+.inventory-item-entering {
+  animation: inventory-item-appear 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+/* Brilho para itens raros no inventário */
+.inventory-item-rare {
+  box-shadow: 0 0 20px 5px rgba(255, 20, 147, 0.6);
+  animation: breathing 3s ease-in-out infinite;
+}
+
+.inventory-item-uncommon {
+  box-shadow: 0 0 15px 3px rgba(0, 255, 0, 0.4);
+}
+
+/* Efeito de hover nos slots */
+.inventory-slot:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+/* Melhorar renderização dos emojis/itens - Pixel Art Style */
+.item-icon {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  text-rendering: optimizeLegibility;
+  filter: 
+    drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.9))
+    drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.5));
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  transform: scale(1);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+/* Ajuste para ícones grandes - Pixel Art */
+.text-4xl.item-icon {
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: pixelated;
+  filter: 
+    drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.9))
+    drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.6))
+    brightness(1.1)
+    contrast(1.2);
+}
+
+.text-xl.item-icon {
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: pixelated;
+  filter: 
+    drop-shadow(1px 1px 0px rgba(0, 0, 0, 0.9))
+    drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.5))
+    brightness(1.05)
+    contrast(1.1);
+}
+
+.text-6xl.item-icon {
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: pixelated;
+  filter: 
+    drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.9))
+    drop-shadow(0px 0px 6px rgba(0, 0, 0, 0.7))
+    brightness(1.15)
+    contrast(1.3);
+}
+
+/* Pixel Art hover effect */
+.item-icon:hover {
+  transform: scale(1.1);
+  filter: 
+    drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.9))
+    drop-shadow(0px 0px 3px rgba(255, 255, 255, 0.3))
+    brightness(1.3);
+}
+
+.text-4xl.item-icon:hover {
+  transform: scale(1.08);
+  filter: 
+    drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.9))
+    drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.4))
+    brightness(1.2)
+    contrast(1.3);
+}
+
+.text-6xl.item-icon:hover {
+  transform: scale(1.05);
+  filter: 
+    drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.9))
+    drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.5))
+    brightness(1.25)
+    contrast(1.4);
+}
+
+/* Pixel art container para itens */
+.inventory-item {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: pixelated;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Pixelated border effect */
+.inventory-item-entering {
+  border-style: solid !important;
+  border-width: 2px !important;
+}
+
+/* Imagens de itens pixel art */
+.item-image {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+  filter: 
+    drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.9))
+    brightness(1.1)
+    contrast(1.2);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.item-image:hover {
+  transform: scale(1.1);
+  filter: 
+    drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.9))
+    brightness(1.3)
+    contrast(1.3);
+}
+
+/* Container para imagem de item */
+.item-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
