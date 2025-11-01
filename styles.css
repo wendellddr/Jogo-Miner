@@ -1,41 +1,672 @@
-/* Estilos do Jogo - Minerador de Moedas */
+/* Estilos do Jogo - Minerador de Moedas - Tema 8-bit Charmoso */
+
+/* Importação de fontes pixel art já incluída no HTML */
 
 body {
   background-color: #1a1a2e;
   color: #ffffff;
-  font-family: "Inter", sans-serif;
+  font-family: "VT323", monospace;
   min-height: 100vh;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
-/* Estilo para o botão principal */
-.click-button {
+/* Efeito de Scanlines (linhas de TV antiga) */
+.scanlines {
+  background: linear-gradient(
+    transparent 50%,
+    rgba(0, 0, 0, 0.03) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Background Pixel Art */
+.pixel-bg {
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.1),
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  background-size: 100% 2px;
+}
+
+/* Classes de Texto Pixel */
+.pixel-text {
+  font-family: "VT323", monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+}
+
+.pixel-text-header {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.75rem;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  letter-spacing: 1px;
+}
+
+.pixel-text-small {
+  font-family: "VT323", monospace;
+  font-size: 0.9rem;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+}
+
+.pixel-number {
+  font-family: "Press Start 2P", cursive;
+  font-size: 1.5rem;
+  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.8);
+  letter-spacing: 2px;
+}
+
+/* Bordas Pixel Art */
+.pixel-border {
+  border: 4px solid;
+  border-color: 
+    rgba(255, 255, 255, 0.3) 
+    rgba(0, 0, 0, 0.5) 
+    rgba(0, 0, 0, 0.5) 
+    rgba(255, 255, 255, 0.3);
+  background-color: var(--theme-dark-card);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.5),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.2),
+    4px 4px 0px rgba(0, 0, 0, 0.3);
+  image-rendering: pixelated;
+}
+
+.pixel-border-inline {
+  border: 3px solid;
+  border-color: 
+    rgba(255, 255, 255, 0.2) 
+    rgba(0, 0, 0, 0.4) 
+    rgba(0, 0, 0, 0.4) 
+    rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    inset 1px 1px 0px rgba(0, 0, 0, 0.4),
+    inset -1px -1px 0px rgba(255, 255, 255, 0.1);
+}
+
+.pixel-border-header {
+  border-bottom: 3px solid var(--theme-primary);
+  box-shadow: 0 2px 0px rgba(0, 0, 0, 0.5);
+}
+
+/* Painéis Pixel Art */
+.pixel-panel {
+  background-color: var(--theme-dark-card);
+  border: 4px solid;
+  border-color: 
+    rgba(255, 255, 255, 0.2) 
+    rgba(0, 0, 0, 0.6) 
+    rgba(0, 0, 0, 0.6) 
+    rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.1),
+    6px 6px 0px rgba(0, 0, 0, 0.4);
+  image-rendering: pixelated;
+}
+
+.pixel-grid {
+  image-rendering: pixelated;
+}
+
+/* Botões Pixel Art */
+.pixel-button {
+  border: 3px solid;
+  border-color: 
+    rgba(255, 255, 255, 0.4) 
+    rgba(0, 0, 0, 0.6) 
+    rgba(0, 0, 0, 0.6) 
+    rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.3),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.2),
+    4px 4px 0px rgba(0, 0, 0, 0.4);
+  image-rendering: pixelated;
+  font-family: "VT323", monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pixel-button:hover {
+  border-color: 
+    rgba(255, 255, 255, 0.6) 
+    rgba(0, 0, 0, 0.4) 
+    rgba(0, 0, 0, 0.4) 
+    rgba(255, 255, 255, 0.6);
+  box-shadow: 
+    inset 1px 1px 0px rgba(0, 0, 0, 0.2),
+    inset -1px -1px 0px rgba(255, 255, 255, 0.3),
+    3px 3px 0px rgba(0, 0, 0, 0.3);
+  transform: translate(1px, 1px);
+}
+
+.pixel-button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.1),
+    1px 1px 0px rgba(0, 0, 0, 0.4);
+}
+
+.pixel-button-small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-width: 2px;
+}
+
+.pixel-button-large {
+  border-width: 4px;
+  font-size: 1rem;
+}
+
+/* Logo Pixel Art */
+.pixel-logo {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.5));
+}
+
+/* Emoji Pixel Art */
+.pixel-emoji {
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.5));
+}
+
+/* Barra de Progresso Pixel */
+.pixel-progress-bg {
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.6);
+}
+
+.pixel-progress {
+  border-right: 2px solid rgba(0, 0, 0, 0.3);
+  box-shadow: inset -2px 0px 0px rgba(255, 255, 255, 0.2);
+}
+
+/* Scrollbar Pixel Art */
+.pixel-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.pixel-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pixel-scroll::-webkit-scrollbar-thumb {
+  background: var(--theme-primary);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: inset 1px 1px 0px rgba(255, 255, 255, 0.2);
+}
+
+.pixel-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-secondary);
+}
+
+/* Header Pixel */
+.pixel-header {
+  border-bottom: 3px solid var(--theme-primary);
+  box-shadow: 0 3px 0px rgba(0, 0, 0, 0.5);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Estilos para Botões - Design Harmonioso e Adaptável ao Tema */
+
+/* Classe base para botões que se adaptam ao tema */
+.theme-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.theme-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.theme-button:hover::before {
+  left: 100%;
+}
+
+.theme-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.theme-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.1s;
-  box-shadow: 0 10px 0 #e6a500;
+}
+
+.theme-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Botões do Menu Principal */
+#continue-button,
+#new-game-button {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+#continue-button:hover,
+#new-game-button:hover {
+  background: linear-gradient(135deg, var(--theme-secondary), var(--theme-primary));
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px) scale(1.02);
+}
+
+#continue-button:active,
+#new-game-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Botão de Toggle de Música */
+#toggle-music-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#toggle-music-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--theme-primary);
+  transform: scale(1.05);
+}
+
+/* Botões do Header (Leaderboard e Meu ID) */
+#leaderboard-button,
+#my-id-button {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+#leaderboard-button:hover,
+#my-id-button:hover {
+  background: linear-gradient(135deg, var(--theme-secondary), var(--theme-primary));
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* Botão de Avançar Mundo */
+#advance-world-button {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#advance-world-button:hover {
+  background: linear-gradient(135deg, var(--theme-secondary), var(--theme-primary));
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  transform: translateY(-3px) scale(1.03);
+}
+
+#advance-world-button:active {
+  transform: translateY(-1px) scale(1.01);
+}
+
+/* Botão de Poder (Power) */
+#power-button {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#power-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--theme-secondary), var(--theme-primary));
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+#power-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+#power-button.bg-green-500 {
+  background: linear-gradient(135deg, #10b981, #34d399) !important;
+  animation: power-active-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes power-active-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.8);
+  }
+}
+
+#power-button.bg-red-600 {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+}
+
+/* Botões de Upgrade */
+[id^="buy-btn-"] {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[id^="buy-btn-"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+[id^="buy-btn-"]:hover::before {
+  left: 100%;
+}
+
+[id^="buy-btn-"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--theme-secondary), var(--theme-primary));
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+[id^="buy-btn-"]:active:not(:disabled) {
+  transform: translateY(0) scale(1);
+}
+
+[id^="buy-btn-"]:disabled {
+  background: linear-gradient(135deg, #4b5563, #6b7280) !important;
+  border-color: rgba(255, 255, 255, 0.1);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Botões de Modal */
+#load-id-button,
+#copy-id-button,
+#close-id-modal {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  font-weight: 700;
+}
+
+#load-id-button::before,
+#copy-id-button::before,
+#close-id-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+#load-id-button:hover::before,
+#copy-id-button:hover::before,
+#close-id-modal:hover::before {
+  left: 100%;
+}
+
+#load-id-button:hover,
+#copy-id-button:hover,
+#close-id-modal:hover {
+  background: linear-gradient(135deg, var(--theme-secondary), var(--theme-primary));
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px) scale(1.05);
+}
+
+#load-id-button:active,
+#copy-id-button:active,
+#close-id-modal:active {
+  transform: translateY(0) scale(1);
+}
+
+#copy-id-button {
+  padding: 0.5rem 0.75rem;
+}
+
+/* Botão de Fechar Leaderboard */
+#close-leaderboard {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+#close-leaderboard:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--theme-primary);
+  transform: scale(1.1) rotate(90deg);
+  color: var(--theme-primary);
+}
+
+/* Estilo para o botão principal de click - Design 8-bit */
+.click-button {
+  position: relative;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 8px 0px rgba(0, 0, 0, 0.4),
+    inset 0 -4px 0px rgba(0, 0, 0, 0.2),
+    inset 0 4px 0px rgba(255, 255, 255, 0.3);
+  transform: translateY(0);
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+  overflow: hidden;
+  border: 4px solid;
+  border-color: 
+    rgba(255, 255, 255, 0.5) 
+    rgba(0, 0, 0, 0.6) 
+    rgba(0, 0, 0, 0.6) 
+    rgba(255, 255, 255, 0.5);
+  image-rendering: pixelated;
+}
+
+.click-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s;
+}
+
+.click-button:hover::before {
+  left: 100%;
+}
+
+.click-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 10px 0px rgba(0, 0, 0, 0.4),
+    inset 0 -4px 0px rgba(0, 0, 0, 0.2),
+    inset 0 4px 0px rgba(255, 255, 255, 0.4),
+    0 0 20px var(--theme-primary);
+  background: linear-gradient(135deg, var(--theme-secondary), var(--theme-primary));
 }
 
 .click-button:active {
-  box-shadow: 0 3px 0 #e6a500;
-  transform: translateY(7px);
+  transform: translateY(4px);
+  box-shadow: 
+    0 2px 0px rgba(0, 0, 0, 0.4),
+    inset 0 -2px 0px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0px rgba(255, 255, 255, 0.2);
+  transition: all 0.1s;
 }
 
-/* Estilização para mensagens temporárias */
+/* Animação de brilho (shimmer) */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Animação de bounce suave para o emoji */
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.05);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 2s ease-in-out infinite;
+}
+
+/* Efeito de pulso quando power está ativo */
+.click-button.power-active {
+  animation: power-pulse 1s ease-in-out infinite;
+  box-shadow: 
+    0 15px 40px rgba(16, 185, 129, 0.6),
+    0 0 30px rgba(16, 185, 129, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+@keyframes power-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 15px 40px rgba(16, 185, 129, 0.6),
+      0 0 30px rgba(16, 185, 129, 0.8),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    box-shadow: 
+      0 20px 50px rgba(16, 185, 129, 0.8),
+      0 0 40px rgba(16, 185, 129, 1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Efeito de partículas ao clicar */
+.click-particle {
+  position: absolute;
+  pointer-events: none;
+  font-size: 1.5rem;
+  animation: particle-float 1s ease-out forwards;
+  opacity: 1;
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(var(--random-x) * 50px),
+      calc(var(--random-y) * 50px - 100px)
+    ) scale(0.3) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Estilização para mensagens temporárias - 8-bit */
 .message-box {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
+  font-family: "VT323", monospace;
 }
 
-/* Estilização e Animação da Moeda Flutuante (+X.XX) */
+.message-box > div {
+  border: 3px solid;
+  border-color: 
+    rgba(255, 255, 255, 0.4) 
+    rgba(0, 0, 0, 0.6) 
+    rgba(0, 0, 0, 0.6) 
+    rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.3),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.2),
+    4px 4px 0px rgba(0, 0, 0, 0.4);
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  font-weight: 700;
+  letter-spacing: 1px;
+  image-rendering: pixelated;
+}
+
+/* Estilização e Animação da Moeda Flutuante (+X.XX) - 8-bit */
 .floating-coin {
   position: absolute;
   pointer-events: none;
   user-select: none;
   opacity: 1;
-  /* Inicia a animação float-up */
   animation: float-up 1s ease-out forwards;
-  white-space: nowrap; /* Garante que o texto não quebre */
+  white-space: nowrap;
+  font-family: "Press Start 2P", cursive;
+  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.8);
+  image-rendering: pixelated;
 }
 
 @keyframes float-up {
@@ -49,31 +680,73 @@ body {
   }
 }
 
-/* Efeito de brilho para cards que podem ser comprados */
+/* Efeito de brilho para cards que podem ser comprados - 8-bit */
 .afford-glow {
-  box-shadow: 0 0 15px rgba(255, 195, 0, 0.5); /* Brilho com a cor primária */
+  box-shadow: 
+    0 0 10px var(--theme-primary),
+    inset 0 0 10px rgba(255, 195, 0, 0.3);
+  border: 2px solid var(--theme-primary) !important;
+  animation: pixel-glow 1.5s ease-in-out infinite;
 }
 
-/* Estilo para cards bloqueados */
+@keyframes pixel-glow {
+  0%, 100% {
+    box-shadow: 
+      0 0 10px var(--theme-primary),
+      inset 0 0 10px rgba(255, 195, 0, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 15px var(--theme-primary),
+      inset 0 0 15px rgba(255, 195, 0, 0.5);
+  }
+}
+
+/* Estilo para cards bloqueados - 8-bit */
 .locked-card {
-  filter: grayscale(80%);
-  opacity: 0.7;
+  filter: grayscale(80%) contrast(0.8);
+  opacity: 0.6;
   cursor: not-allowed;
-  border: 2px solid #5a5a7a;
+  border: 3px solid #5a5a7a !important;
+  position: relative;
 }
 
-/* Estilos para cards de conquistas */
+.locked-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    rgba(0, 0, 0, 0.1) 4px,
+    rgba(0, 0, 0, 0.1) 8px
+  );
+  pointer-events: none;
+}
+
+/* Estilos para cards de conquistas - 8-bit */
 .achievement-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  image-rendering: pixelated;
 }
 
 .achievement-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.5),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.2),
+    4px 4px 0px rgba(0, 0, 0, 0.3),
+    0 0 10px var(--theme-primary);
 }
 
 .achievement-card.completed {
   animation: achievement-complete 0.5s ease-out;
+  border-color: var(--theme-primary) !important;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(34, 211, 153, 0.1));
 }
 
 @keyframes achievement-complete {
@@ -116,24 +789,115 @@ body {
   background: rgba(255, 195, 0, 0.7);
 }
 
-/* Estilos para slots do inventário */
+/* Estilos para slots do inventário - 8-bit */
 .inventory-slot {
   aspect-ratio: 1;
   min-height: 50px;
+  border: 2px solid;
+  border-color: 
+    rgba(255, 255, 255, 0.2) 
+    rgba(0, 0, 0, 0.4) 
+    rgba(0, 0, 0, 0.4) 
+    rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    inset 1px 1px 0px rgba(0, 0, 0, 0.4),
+    inset -1px -1px 0px rgba(255, 255, 255, 0.1);
+  image-rendering: pixelated;
+  transition: all 0.2s ease;
 }
 
 .inventory-slot:hover {
   transform: scale(1.1);
+  border-color: 
+    rgba(255, 255, 255, 0.4) 
+    rgba(0, 0, 0, 0.2) 
+    rgba(0, 0, 0, 0.2) 
+    rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    inset 1px 1px 0px rgba(0, 0, 0, 0.2),
+    inset -1px -1px 0px rgba(255, 255, 255, 0.3),
+    0 0 10px var(--theme-primary);
 }
 
-/* Estilos para slots da mochila */
+/* Estilos para slots da mochila - 8-bit */
 .bag-slot {
   aspect-ratio: 1;
   min-height: 60px;
+  border: 3px solid;
+  border-color: 
+    rgba(255, 255, 255, 0.3) 
+    rgba(0, 0, 0, 0.5) 
+    rgba(0, 0, 0, 0.5) 
+    rgba(255, 255, 255, 0.3);
+  background-color: rgba(0, 0, 0, 0.4);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.5),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.2);
+  image-rendering: pixelated;
+  transition: all 0.2s ease;
 }
 
 .bag-slot:hover {
   transform: scale(1.1);
+  border-color: var(--theme-primary);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.3),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.3),
+    0 0 15px var(--theme-primary);
+}
+
+.bag-slot.empty {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Mensagens - Estilo 8-bit */
+.message-box {
+  font-family: "VT323", monospace;
+}
+
+.message-box > div {
+  border: 3px solid;
+  border-color: 
+    rgba(255, 255, 255, 0.4) 
+    rgba(0, 0, 0, 0.6) 
+    rgba(0, 0, 0, 0.6) 
+    rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.3),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.2),
+    4px 4px 0px rgba(0, 0, 0, 0.4);
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Menu Inicial - Estilo 8-bit */
+.main-menu-overlay {
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.5s ease-in;
+  border: 4px solid var(--theme-primary);
+  box-shadow: 
+    inset 4px 4px 0px rgba(0, 0, 0, 0.5),
+    inset -4px -4px 0px rgba(255, 255, 255, 0.2),
+    8px 8px 0px rgba(0, 0, 0, 0.5);
+}
+
+/* Cards de Conquistas - Melhorias 8-bit */
+.achievement-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.5),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.2),
+    4px 4px 0px rgba(0, 0, 0, 0.3),
+    0 0 10px var(--theme-primary);
+}
+
+.achievement-card.completed {
+  animation: achievement-complete 0.5s ease-out;
+  border-color: var(--theme-primary) !important;
 }
 
 #inventory-container::-webkit-scrollbar {
@@ -167,10 +931,15 @@ body {
   display: block !important;
 }
 
-/* Estilo para o menu inicial */
+/* Estilo para o menu inicial - 8-bit */
 .main-menu-overlay {
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
   animation: fadeIn 0.5s ease-in;
+  border: 4px solid var(--theme-primary);
+  box-shadow: 
+    inset 4px 4px 0px rgba(0, 0, 0, 0.5),
+    inset -4px -4px 0px rgba(255, 255, 255, 0.2),
+    8px 8px 0px rgba(0, 0, 0, 0.5);
 }
 
 /* Animação de fade-in para o menu */
@@ -195,23 +964,91 @@ body {
   width: 100%;
 }
 
-/* Scrollbar personalizada para o sidebar de ranking */
+/* Scrollbar personalizada para o sidebar de ranking - 8-bit */
 #leaderboard-sidebar::-webkit-scrollbar {
   width: 8px;
 }
 
 #leaderboard-sidebar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #leaderboard-sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 195, 0, 0.3);
-  border-radius: 4px;
+  background: var(--theme-primary);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: inset 1px 1px 0px rgba(255, 255, 255, 0.2);
 }
 
 #leaderboard-sidebar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 195, 0, 0.5);
+  background: var(--theme-secondary);
+}
+
+/* Estilos adicionais 8-bit */
+#leaderboard-sidebar {
+  border-left: 4px solid var(--theme-primary);
+  box-shadow: 
+    inset -4px 0px 0px rgba(0, 0, 0, 0.5),
+    -4px 0px 0px rgba(0, 0, 0, 0.5);
+}
+
+#leaderboard-sidebar h2 {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.75rem;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+}
+
+#loading-overlay {
+  border: 4px solid var(--theme-primary);
+  box-shadow: 
+    inset 4px 4px 0px rgba(0, 0, 0, 0.5),
+    inset -4px -4px 0px rgba(255, 255, 255, 0.2);
+}
+
+#loading-overlay > div {
+  font-family: "VT323", monospace;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+}
+
+#loading-overlay .animate-spin {
+  border-width: 4px;
+  border-color: var(--theme-primary);
+  image-rendering: pixelated;
+}
+
+#player-id-modal > div {
+  border: 4px solid var(--theme-primary);
+  box-shadow: 
+    inset 4px 4px 0px rgba(0, 0, 0, 0.5),
+    inset -4px -4px 0px rgba(255, 255, 255, 0.2),
+    8px 8px 0px rgba(0, 0, 0, 0.5);
+}
+
+#player-id-modal h2 {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.75rem;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+}
+
+#player-id-modal input {
+  border: 2px solid;
+  border-color: 
+    rgba(255, 255, 255, 0.2) 
+    rgba(0, 0, 0, 0.4) 
+    rgba(0, 0, 0, 0.4) 
+    rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.1);
+  font-family: "VT323", monospace;
+}
+
+#player-id-modal input:focus {
+  border-color: var(--theme-primary);
+  box-shadow: 
+    inset 2px 2px 0px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 0px rgba(255, 255, 255, 0.1),
+    0 0 10px var(--theme-primary);
 }
 
 /* Animação de picareta para loading */

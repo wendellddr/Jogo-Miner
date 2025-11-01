@@ -274,6 +274,11 @@ function addItemToInventory(item) {
   saveInventory();
   renderInventory();
 
+  // Rastreia item encontrado para estatísticas
+  if (typeof trackItemFound === "function") {
+    trackItemFound();
+  }
+
   if (typeof showMessage === "function") {
     showMessage(`Novo item obtido: ${item.name} ${item.icon}`, false);
   }
@@ -532,12 +537,12 @@ function renderBag() {
       const emoji = getItemEmoji(item);
       const rarityColor = getRarityColor(item.rarity);
 
-      slot.className = `bag-slot p-2 rounded-lg border-2 transition duration-200 cursor-pointer bg-green-500/20 border-green-400 ${rarityColor} hover:scale-105`;
+      slot.className = `bag-slot p-2 cursor-pointer ${rarityColor} hover:scale-105`;
 
       slot.innerHTML = `
         <div class="flex flex-col items-center justify-center h-full">
-          <span class="text-xl mb-1">${emoji}</span>
-          <div class="text-xs font-semibold truncate w-full text-center text-green-300">
+          <span class="text-xl mb-1 pixel-emoji">${emoji}</span>
+          <div class="text-xs font-semibold truncate w-full text-center text-green-300 pixel-text-small">
             ✓
           </div>
         </div>
@@ -554,11 +559,10 @@ function renderBag() {
         removeItemFromBag(item.id);
       });
     } else {
-      slot.className =
-        "bag-slot p-2 rounded-lg border-2 border-gray-600 bg-gray-800/30";
+      slot.className = "bag-slot empty p-2";
       slot.innerHTML = `
-        <div class="flex items-center justify-center h-full text-gray-500 text-xs">
-          Vazio
+        <div class="flex items-center justify-center h-full text-gray-500 text-xs pixel-text-small">
+          +
         </div>
       `;
       slot.title = "Slot vazio da mochila";
@@ -591,7 +595,7 @@ function renderInventory() {
       // Verifica se o item está na mochila
       const isInBag = bagState.items.some((bagItem) => bagItem.id === item.id);
 
-      slot.className = `inventory-slot p-2 rounded-lg border-2 transition duration-200 cursor-pointer ${
+      slot.className = `inventory-slot p-2 cursor-pointer ${
         isInBag
           ? "bg-blue-500/20 border-blue-400"
           : `bg-gray-700/50 ${rarityColor}`
@@ -599,10 +603,10 @@ function renderInventory() {
 
       slot.innerHTML = `
         <div class="flex flex-col items-center justify-center h-full">
-          <span class="text-xl mb-1">${emoji}</span>
+          <span class="text-xl mb-1 pixel-emoji">${emoji}</span>
           <div class="text-xs font-semibold truncate w-full text-center ${
             isInBag ? "text-blue-300" : ""
-          }">
+          } pixel-text-small">
             ${isInBag ? "📦" : ""}
           </div>
         </div>
@@ -627,11 +631,10 @@ function renderInventory() {
         }
       });
     } else {
-      slot.className =
-        "inventory-slot p-2 rounded-lg border-2 border-gray-600 bg-gray-800/30";
+      slot.className = "inventory-slot p-2";
       slot.innerHTML = `
-        <div class="flex items-center justify-center h-full text-gray-500 text-xs">
-          Vazio
+        <div class="flex items-center justify-center h-full text-gray-500 text-xs pixel-text-small">
+          +
         </div>
       `;
     }

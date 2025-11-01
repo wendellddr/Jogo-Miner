@@ -122,6 +122,8 @@ function loadGame() {
 
         if (offlineGain > 0) {
           gameState.coins += offlineGain;
+          // Arredonda moedas para inteiro
+          gameState.coins = Math.round(gameState.coins);
           showMessage(
             `Bem-vindo de volta! Ganhos offline: ${formatNumber(
               offlineGain
@@ -143,12 +145,14 @@ function loadGame() {
 // --- Funções Auxiliares de UI ---
 
 function formatNumber(num) {
-  // Formata o número para exibição, incluindo abreviações para números grandes.
+  // Formata o número para exibição como inteiro, incluindo abreviações para números grandes.
   const absNum = Math.abs(num);
-  if (absNum >= 1000000000) return (num / 1000000000).toFixed(2) + " B";
-  if (absNum >= 1000000) return (num / 1000000).toFixed(2) + " M";
-  if (absNum >= 1000) return (num / 1000).toFixed(2) + " K";
-  return parseFloat(num.toFixed(2)).toLocaleString("pt-BR");
+  const roundedNum = Math.round(num);
+  
+  if (absNum >= 1000000000) return Math.round(roundedNum / 1000000000) + " B";
+  if (absNum >= 1000000) return Math.round(roundedNum / 1000000) + " M";
+  if (absNum >= 1000) return Math.round(roundedNum / 1000) + " K";
+  return roundedNum.toLocaleString("pt-BR");
 }
 
 function showMessage(text, isError = false) {
@@ -206,6 +210,46 @@ function createFloatingCoin(amount, targetElement, isCritical = false) {
   }, 1000);
 }
 
+/**
+ * Cria partículas visuais ao clicar no botão
+ * @param {HTMLElement} button - Elemento do botão
+ * @param {boolean} isCritical - Se foi um clique crítico
+ */
+function createClickParticles(button, isCritical = false) {
+  const particlesContainer = button.querySelector("#click-particles");
+  if (!particlesContainer) return;
+
+  const emojis = isCritical 
+    ? ["💥", "⭐", "✨", "💎", "🔥", "⚡"]
+    : ["💰", "✨", "💫", "⭐"];
+
+  const particleCount = isCritical ? 8 : 4;
+
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement("div");
+    particle.className = "click-particle";
+    particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    
+    // Posição aleatória ao redor do centro do botão
+    const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
+    const distance = 30 + Math.random() * 20;
+    const randomX = Math.cos(angle) * distance;
+    const randomY = Math.sin(angle) * distance;
+    
+    particle.style.setProperty("--random-x", randomX / 50);
+    particle.style.setProperty("--random-y", randomY / 50);
+    particle.style.left = "50%";
+    particle.style.top = "50%";
+    particle.style.transform = "translate(-50%, -50%)";
+
+    particlesContainer.appendChild(particle);
+
+    setTimeout(() => {
+      particle.remove();
+    }, 1000);
+  }
+}
+
 function updateUI() {
   // Atualiza Moedas
   document.getElementById("coins-display").textContent = formatNumber(
@@ -232,19 +276,28 @@ function updateUI() {
     "click-rate-display"
   ).textContent = `Moedas/Clique: ${formatNumber(currentCPC)}`;
 
-  // Atualiza texto do botão de clique usando tema se disponível
   const clickButton = document.getElementById("click-button");
+
+  // Atualiza o texto do botão de clique usando tema se disponível
   if (clickButton) {
-    const textSpan = clickButton.querySelector("span:last-child");
-    if (textSpan) {
-      let clickText = "Minerar";
-      if (typeof getCurrentTheme === "function") {
-        const theme = getCurrentTheme();
-        if (theme && theme.texts && theme.texts.clickButton) {
-          clickText = theme.texts.clickButton;
-        }
+    const amountDisplay = clickButton.querySelector("#click-amount-display");
+    if (amountDisplay) {
+      let currentCPC = gameState.coinsPerClick;
+      if (gameState.powerActive) {
+        currentCPC *= gameState.powerMultiplier;
       }
-      textSpan.textContent = `${clickText} ( +${formatNumber(currentCPC)} )`;
+      // Aplica buffs do inventário
+      if (typeof getInventoryCPCMultiplier === "function") {
+        currentCPC *= getInventoryCPCMultiplier();
+      }
+      amountDisplay.textContent = `+${formatNumber(currentCPC)} Moedas`;
+    }
+
+    // Adiciona classe de power ativo para efeito visual
+    if (gameState.powerActive) {
+      clickButton.classList.add("power-active");
+    } else {
+      clickButton.classList.remove("power-active");
     }
   }
 
@@ -366,18 +419,18 @@ function updateUI() {
       formatNumber(nextCost);
     document.getElementById(`count-${upgrade.id}`).textContent = level;
 
-    // Atualiza Estado Visual (CSS classes e disabled state)
+    // Atualiza Estado Visual (CSS classes e disabled state) - Estilo 8-bit
     const cardBaseClasses =
-      "flex items-center justify-between p-4 rounded-xl transition duration-200";
+      "pixel-border flex items-center justify-between p-3 transition duration-200";
 
     // Atualiza o display de pré-requisito
     const prereqDisplay = document.getElementById(`prereq-msg-${upgrade.id}`);
 
     if (!canBuy) {
       // Bloqueado por custo OU pré-requisito
-      card.className = `${cardBaseClasses} locked-card bg-gray-700/50`;
+      card.className = `${cardBaseClasses} locked-card bg-gray-800/50`;
       buyButton.className =
-        "py-2 px-4 rounded-full font-bold text-sm transition duration-150 shadow-md bg-gray-500 cursor-not-allowed text-gray-300";
+        "pixel-button py-2 px-3 text-xs font-bold bg-gray-600 cursor-not-allowed text-gray-300";
       buyButton.disabled = true;
 
       if (!isPrereqMet && prereqDisplay) {
@@ -390,7 +443,7 @@ function updateUI() {
       // Pode Comprar (tem dinheiro E atendeu pré-requisito)
       card.className = `${cardBaseClasses} afford-glow bg-dark-bg hover:bg-dark-card/70`;
       buyButton.className =
-        "py-2 px-4 rounded-full font-bold text-sm transition duration-150 shadow-md bg-green-500 hover:bg-green-600 text-white";
+        "theme-button pixel-button py-2 px-3 text-xs text-white font-bold";
       buyButton.disabled = false;
       if (prereqDisplay) prereqDisplay.classList.add("hidden");
     }
@@ -420,7 +473,7 @@ function calculateCost(upgradeId) {
   const upgrade = getUpgradeDefinition(upgradeId);
   const level = getUpgradeLevel(upgradeId);
   if (!upgrade) return Infinity;
-  return upgrade.baseCost * Math.pow(upgrade.costMultiplier, level);
+  return Math.round(upgrade.baseCost * Math.pow(upgrade.costMultiplier, level));
 }
 
 function calculateTotalCPS() {
@@ -766,6 +819,8 @@ function clickCoin() {
     }
   }
 
+  // Arredonda o valor ganho para inteiro antes de adicionar
+  earnedAmount = Math.round(earnedAmount);
   gameState.coins += earnedAmount;
 
   // Rastreia total de moedas ganhas para progresso de mundos
@@ -773,6 +828,10 @@ function clickCoin() {
     gameState.totalCoinsEarned = 0;
   }
   gameState.totalCoinsEarned += earnedAmount;
+  
+  // Arredonda moedas para inteiro
+  gameState.coins = Math.round(gameState.coins);
+  gameState.totalCoinsEarned = Math.round(gameState.totalCoinsEarned);
 
   // Rastreia clique
   if (typeof trackClick === "function") {
@@ -796,10 +855,14 @@ function clickCoin() {
     }, 50); // Pequeno delay para o som de moeda vir depois do impacto
   }
 
+  // Cria partículas visuais ao clicar
+  createClickParticles(clickButton, isCritical);
+
   createFloatingCoin(earnedAmount, clickButton, isCritical);
 
+  // Animação de clique mais suave
   clickButton.classList.add("animate-pulse");
-  setTimeout(() => clickButton.classList.remove("animate-pulse"), 100);
+  setTimeout(() => clickButton.classList.remove("animate-pulse"), 150);
 
   updateUI();
 }
@@ -816,6 +879,11 @@ function activatePower() {
     // Rastreia ativação do poder
     if (typeof trackPowerActivated === "function") {
       trackPowerActivated();
+    }
+    
+    // Rastreia uso de poder para estatísticas
+    if (typeof trackPowerUsed === "function") {
+      trackPowerUsed();
     }
 
     showMessage(
@@ -854,6 +922,8 @@ function buyUpgrade(upgradeId) {
 
   if (gameState.coins >= cost) {
     gameState.coins -= cost;
+    // Arredonda moedas para inteiro após compra
+    gameState.coins = Math.round(gameState.coins);
 
     gameState.upgradeLevels[upgradeId] = getUpgradeLevel(upgradeId) + 1;
 
@@ -925,6 +995,14 @@ function gameLoop() {
   // Recalcula CPS e CPC (sempre bom recalcular no loop)
   gameState.coinsPerSecond = calculateTotalCPS();
   gameState.coinsPerClick = calculateTotalCPC();
+  
+  // Atualiza estatísticas de CPS e CPC máximo
+  if (typeof updateHighestCPS === "function") {
+    updateHighestCPS(gameState.coinsPerSecond);
+  }
+  if (typeof updateHighestCPC === "function") {
+    updateHighestCPC(gameState.coinsPerClick);
+  }
 
   let currentCPS = gameState.coinsPerSecond;
 
@@ -936,6 +1014,9 @@ function gameLoop() {
     const earned = currentCPS * deltaTime;
     gameState.coins += earned;
     gameState.totalCoinsEarned += earned; // Rastreia total ganho para progresso
+    // Arredonda moedas para inteiro
+    gameState.coins = Math.round(gameState.coins);
+    gameState.totalCoinsEarned = Math.round(gameState.totalCoinsEarned);
   }
 
   lastUpdateTime = now;
@@ -1005,44 +1086,44 @@ function renderUpgradeCard(upgrade, container, isLocked = false) {
   }
 
   if (isLocked) {
-    // Renderização para item BLOQUEADO (Dica)
+    // Renderização para item BLOQUEADO (Dica) - Estilo 8-bit
     card.className =
-      "locked-card p-4 rounded-xl transition duration-200 bg-gray-800/50 flex items-center space-x-4";
+      "locked-card pixel-border p-3 flex items-center space-x-3";
     card.innerHTML = `
-            <span class="text-4xl text-gray-500">🔒</span>
-            <div>
-                <p class="text-xl font-semibold text-gray-400">Upgrade Desconhecido</p>
-                <p class="text-sm text-gray-500">Alcance ${formatNumber(
+            <span class="text-3xl text-gray-500 pixel-emoji">🔒</span>
+            <div class="flex-1">
+                <p class="text-base font-semibold text-gray-400 pixel-text">Upgrade Desconhecido</p>
+                <p class="text-xs text-gray-500 pixel-text-small">Alcance ${formatNumber(
                   upgrade.unlockCPS
-                )} MPS para desbloquear este item.</p>
+                )} MPS para desbloquear</p>
             </div>
         `;
   } else {
-    // Renderização para item ATIVO (Comprável)
+    // Renderização para item ATIVO (Comprável) - Estilo 8-bit
     card.className =
-      "flex items-center justify-between p-4 rounded-xl transition duration-200 bg-gray-700/50";
+      "pixel-border flex items-center justify-between p-3 transition duration-200";
     card.innerHTML = `
-            <div class="flex items-center space-x-4">
-                <span class="text-4xl">${upgradeIcon}</span>
-                <div>
-                    <p class="text-xl font-semibold">${
+            <div class="flex items-center space-x-3 flex-1">
+                <span class="text-3xl pixel-emoji">${upgradeIcon}</span>
+                <div class="flex-1 min-w-0">
+                    <p class="text-base font-semibold pixel-text">${
                       upgrade.name
-                    } (Nível <span id="count-${upgrade.id}">${level}</span>)</p>
-                    <p class="text-sm text-gray-400">${upgrade.description}</p>
-                    <p class="text-sm text-green-400">Ganha ${formatNumber(
+                    } <span class="text-xs text-gray-400">(Nv.<span id="count-${upgrade.id}">${level}</span>)</span></p>
+                    <p class="text-xs text-gray-400 pixel-text-small truncate">${upgrade.description}</p>
+                    <p class="text-xs text-green-400 pixel-text-small">+${formatNumber(
                       upgrade.baseGain
-                    )} ${gainTextType} por nível</p>
+                    )} ${gainTextType}/nível</p>
                      <!-- Mensagem de Pré-requisito (visível apenas se não atendido) -->
                     <p id="prereq-msg-${
                       upgrade.id
-                    }" class="text-xs font-semibold text-secondary mt-1 hidden"></p>
+                    }" class="text-xs font-semibold text-secondary mt-1 hidden pixel-text-small"></p>
                 </div>
             </div>
             <button id="buy-btn-${upgrade.id}" 
                     data-upgrade-id="${upgrade.id}" 
-                    class="py-2 px-4 rounded-full font-bold text-sm transition duration-150 shadow-md bg-gray-500 cursor-not-allowed text-gray-300"
+                    class="theme-button pixel-button py-2 px-3 text-xs text-white font-bold whitespace-nowrap ml-2"
                     disabled>
-                Comprar (<span id="cost-${upgrade.id}">0.00</span> Moedas)
+                Comprar (<span id="cost-${upgrade.id}">0</span>)
             </button>
         `;
   }

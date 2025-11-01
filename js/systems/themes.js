@@ -105,6 +105,12 @@ function advanceToNextWorld() {
   saveWorld();
   applyTheme(currentWorld);
 
+  // Atualiza estatísticas de mundos desbloqueados
+  if (typeof updateWorldsUnlocked === "function") {
+    const currentIndex = getCurrentWorldIndex();
+    updateWorldsUnlocked(currentIndex + 1);
+  }
+
   if (typeof showMessage === "function") {
     showMessage(`🌍 Mundo desbloqueado: ${nextWorld.name}!`, false);
   }
@@ -457,12 +463,8 @@ function applyThemeColors(theme) {
     el.style.backgroundColor = theme.darkCard;
   });
 
-  // Atualiza cores dos botões principais
-  const clickButton = document.getElementById("click-button");
-  if (clickButton) {
-    clickButton.style.backgroundColor = theme.primary;
-    clickButton.style.color = theme.darkBg;
-  }
+  // Atualiza cores dos botões principais (agora usa gradiente CSS via variáveis)
+  // Os botões agora usam CSS com variáveis que são atualizadas automaticamente
 
   // Atualiza cores secundárias
   const secondaryElements = document.querySelectorAll(".text-secondary");
