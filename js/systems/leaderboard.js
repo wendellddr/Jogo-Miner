@@ -5,7 +5,7 @@
 
 // Configuração da API
 const LEADERBOARD_API_KEY = "$2a$10$EpuCgK6DgQlDGMOkL.H3EOl81pf2SGyQBvsUMGTqQklMLuBN6AX5a";
-const LEADERBOARD_BIN_ID = "690521d543b1c97be98f4023";
+const LEADERBOARD_BIN_ID = "69054e2c43b1c97be98f7c7e";
 const LEADERBOARD_API_URL = `https://api.jsonbin.io/v3/b/${LEADERBOARD_BIN_ID}`;
 
 // Estado do leaderboard
@@ -13,10 +13,14 @@ let leaderboardData = [];
 let playerName = "";
 let playerId = ""; // ID único e persistente
 let lastLeaderboardLoad = 0;
-const LEADERBOARD_CACHE_TIME = 60000; // 1 minuto de cache
+const LEADERBOARD_CACHE_TIME = 300000; // 5 minutos de cache (muito mais econômico!)
 let autoRefreshInterval = null; // Interval para atualização automática
 let currentRefreshRate = 10000; // Taxa de atualização em ms (10s padrão)
 let lastPlayerAction = 0; // Timestamp da última ação do jogador
+let autoRefreshEnabled = false; // Controle se auto-refresh está ativo
+let cachedBinDataForSubmit = null; // Cache local dos dados do bin para submissão
+let lastBinFetchForSubmit = 0;
+const BIN_CACHE_TIME_FOR_SUBMIT = 15000; // Cache do bin por 15 segundos
 
 /**
  * Gera um ID único para o jogador (persistente)
@@ -198,17 +202,33 @@ async function submitScore(score, coins) {
     // Salva no servidor (preservando auth e cloudSaves se existirem)
     const savePayload = { leaderboard: leaderboardData };
     
-    // Tenta preservar auth e cloudSaves se existirem no bin
+    // Tenta preservar auth e cloudSaves se existirem no bin (com cache)
+    const now = Date.now();
     try {
-      const currentData = await fetch(LEADERBOARD_API_URL + "/latest", {
-        headers: { "X-Master-Key": LEADERBOARD_API_KEY },
-      }).then(r => r.json());
-      
-      if (currentData.record && currentData.record.auth) {
-        savePayload.auth = currentData.record.auth;
-      }
-      if (currentData.record && currentData.record.cloudSaves) {
-        savePayload.cloudSaves = currentData.record.cloudSaves;
+      // Usa cache se disponível e recente
+      if (cachedBinDataForSubmit && (now - lastBinFetchForSubmit) < BIN_CACHE_TIME_FOR_SUBMIT) {
+        if (cachedBinDataForSubmit.auth) {
+          savePayload.auth = cachedBinDataForSubmit.auth;
+        }
+        if (cachedBinDataForSubmit.cloudSaves) {
+          savePayload.cloudSaves = cachedBinDataForSubmit.cloudSaves;
+        }
+      } else {
+        // Busca do servidor se não tem cache ou está antigo
+        const currentData = await fetch(LEADERBOARD_API_URL + "/latest", {
+          headers: { "X-Master-Key": LEADERBOARD_API_KEY },
+        }).then(r => r.json());
+        
+        if (currentData.record && currentData.record.auth) {
+          savePayload.auth = currentData.record.auth;
+        }
+        if (currentData.record && currentData.record.cloudSaves) {
+          savePayload.cloudSaves = currentData.record.cloudSaves;
+        }
+        
+        // Atualiza cache
+        cachedBinDataForSubmit = currentData.record || {};
+        lastBinFetchForSubmit = now;
       }
     } catch (e) {
       // Ignora erro - bin pode estar vazio ou diferente
@@ -226,6 +246,9 @@ async function submitScore(score, coins) {
     if (response.ok) {
       console.log("Pontuação submetida com sucesso!");
       lastLeaderboardLoad = 0; // Invalida cache para mostrar dados atualizados
+      // Atualiza cache com os dados salvos
+      cachedBinDataForSubmit = savePayload;
+      lastBinFetchForSubmit = Date.now();
       updateLeaderboardUI();
       return true;
     } else {
@@ -390,8 +413,8 @@ function stopAutoRefresh() {
 // Função de inicialização
 function initLeaderboardSystem() {
   initializeLeaderboard();
-  // Inicia atualização automática
-  startAutoRefresh();
+  // NÃO inicia atualização automática (economiza requisições!)
+  // startAutoRefresh();
   // Inicializa UI do sidebar
   initializeLeaderboardSidebar();
   // Inicializa UI do modal de ID
@@ -424,17 +447,35 @@ if (typeof window !== "undefined") {
 function initializeLeaderboardSidebar() {
   const leaderboardButton = document.getElementById("leaderboard-button");
   const closeButton = document.getElementById("close-leaderboard");
+  const refreshButton = document.getElementById("refresh-leaderboard");
   const overlay = document.getElementById("leaderboard-overlay");
   const sidebar = document.getElementById("leaderboard-sidebar");
 
   // Abrir sidebar
   if (leaderboardButton) {
-    leaderboardButton.addEventListener("click", () => {
+    leaderboardButton.addEventListener("click", async () => {
       if (sidebar) {
+        // Atualiza o score antes de abrir o ranking
+        if (typeof gameState !== "undefined" && typeof submitScore === "function") {
+          await submitScore(gameState.coins, gameState.coins);
+        }
+        // Carrega o ranking quando abrir (com cache inteligente)
+        await loadLeaderboard();
         sidebar.classList.remove("translate-x-full");
         if (overlay) overlay.classList.remove("hidden");
         markPlayerActivity();
       }
+    });
+  }
+
+  // Botão de refresh
+  if (refreshButton) {
+    refreshButton.addEventListener("click", async () => {
+      // Força atualização ignorando cache
+      refreshButton.textContent = "⏳";
+      lastLeaderboardLoad = 0;
+      await loadLeaderboard();
+      refreshButton.textContent = "🔄";
     });
   }
 
