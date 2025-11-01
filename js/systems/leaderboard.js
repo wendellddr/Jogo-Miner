@@ -455,12 +455,26 @@ function initializeLeaderboardSidebar() {
   if (leaderboardButton) {
     leaderboardButton.addEventListener("click", async () => {
       if (sidebar) {
-        // Atualiza o score antes de abrir o ranking
-        if (typeof gameState !== "undefined" && typeof submitScore === "function") {
-          await submitScore(gameState.coins, gameState.coins);
+        // Mostra loading
+        const loadingElement = document.getElementById("loading-leaderboard");
+        if (loadingElement) {
+          loadingElement.classList.remove("hidden");
         }
-        // Carrega o ranking quando abrir (com cache inteligente)
-        await loadLeaderboard();
+        
+        try {
+          // Atualiza o score antes de abrir o ranking
+          if (typeof gameState !== "undefined" && typeof submitScore === "function") {
+            await submitScore(gameState.coins, gameState.coins);
+          }
+          // Carrega o ranking quando abrir (com cache inteligente)
+          await loadLeaderboard();
+        } finally {
+          // Esconde loading
+          if (loadingElement) {
+            loadingElement.classList.add("hidden");
+          }
+        }
+        
         sidebar.classList.remove("translate-x-full");
         if (overlay) overlay.classList.remove("hidden");
         markPlayerActivity();
@@ -526,14 +540,24 @@ function initializePlayerIdModal() {
   // Abrir modal
   if (myIdButton) {
     myIdButton.addEventListener("click", () => {
-      if (modal && playerIdDisplay) {
-        // Atualiza o ID exibido
-        const currentId = getCurrentPlayerIdForCloud();
-        if (currentId) {
-          playerIdDisplay.value = currentId;
-        } else {
-          playerIdDisplay.value = "Sem ID";
+      if (modal) {
+        // Atualiza o nome do jogador
+        const playerNameDisplay = document.getElementById("cloud-save-player-name");
+        if (playerNameDisplay) {
+          const playerName = localStorage.getItem("coinClickerPlayerName") || "Minerador";
+          playerNameDisplay.textContent = playerName;
         }
+        
+        // Atualiza o ID exibido
+        if (playerIdDisplay) {
+          const currentId = getCurrentPlayerIdForCloud();
+          if (currentId) {
+            playerIdDisplay.value = currentId;
+          } else {
+            playerIdDisplay.value = "Sem ID";
+          }
+        }
+        
         modal.classList.remove("hidden");
       }
     });

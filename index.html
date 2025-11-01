@@ -422,15 +422,15 @@
         </section>
       </main>
 
-      <!-- Seção de Prestígio -->
-      <section class="w-full max-w-7xl mx-auto px-4 py-6">
+      <!-- Seção de Prestígio (escondida inicialmente) -->
+      <section class="w-full max-w-7xl mx-auto px-4 py-6 hidden">
         <div id="prestige-container">
           <!-- Conteúdo será inserido pelo JavaScript -->
         </div>
       </section>
 
-      <!-- Seção Procedural -->
-      <section class="w-full max-w-7xl mx-auto px-4 py-6">
+      <!-- Seção Procedural (escondida inicialmente) -->
+      <section class="w-full max-w-7xl mx-auto px-4 py-6 hidden">
         <div id="procedural-container">
           <!-- Conteúdo será inserido pelo JavaScript -->
         </div>
@@ -500,32 +500,12 @@
         class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"
       ></div>
 
-      <!-- Modal de Estatísticas -->
-      <div
-        id="stats-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-      >
-        <div
-          class="bg-dark-card pixel-border max-w-2xl w-full mx-4 p-6 max-h-[90vh] overflow-y-auto pixel-scroll"
-        >
-          <div class="flex justify-between items-center mb-4">
-            <h2
-              class="text-2xl font-bold text-primary pixel-text-header flex items-center space-x-2"
-            >
-              <span>📊</span>
-              <span>Estatísticas</span>
-            </h2>
-            <button
-              id="close-stats-modal"
-              class="theme-button pixel-button-small text-white font-bold py-1 px-3 text-lg"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div id="stats-content" class="space-y-4">
-            <!-- Estatísticas serão inseridas aqui pelo JavaScript -->
-          </div>
+      <!-- Loading de Ranking -->
+      <div id="loading-leaderboard" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[60]">
+        <div class="text-center">
+          <div class="text-6xl animate-mine-swing mb-4">⛏️</div>
+          <p class="text-xl text-primary font-bold">Atualizando ranking...</p>
+          <p class="text-sm text-gray-400 mt-2">Aguarde um momento</p>
         </div>
       </div>
 
@@ -546,15 +526,23 @@
           </div>
         </div>
 
-        <div
-          class="bg-dark-card rounded-xl shadow-2xl max-w-md w-full mx-4 p-6"
-        >
-          <h2
-            class="text-2xl font-bold text-primary mb-4 flex items-center space-x-2"
-          >
-            <span>☁️</span>
-            <span>Salvamento em Nuvem</span>
-          </h2>
+        <div class="bg-dark-card rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
+          <!-- Header com Nome do Usuário -->
+          <div class="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg p-4 mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="text-2xl font-bold text-white flex items-center space-x-2">
+                <span>☁️</span>
+                <span>Salvamento em Nuvem</span>
+              </h2>
+            </div>
+            <div class="flex items-center space-x-2 bg-white/10 rounded-lg px-3 py-2">
+              <span class="text-2xl">👤</span>
+              <div class="flex-1">
+                <p class="text-xs text-blue-200 font-semibold">Jogador</p>
+                <p id="cloud-save-player-name" class="text-white font-bold text-sm truncate">Carregando...</p>
+              </div>
+            </div>
+          </div>
 
           <!-- Seção: Usar ID existente -->
           <div class="mb-4">
@@ -632,6 +620,162 @@
           </button>
         </div>
       </div>
+
+      <!-- Sidebar de Prestígio/Ascensão -->
+      <div
+        id="prestige-sidebar"
+        class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-dark-card shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto"
+      >
+        <!-- Header do Sidebar -->
+        <div class="sticky top-0 bg-gradient-to-r from-purple-900 to-indigo-900 border-b border-purple-600 p-4 flex justify-between items-center">
+          <h2 class="text-2xl font-bold text-purple-200">⭐ Ascensão</h2>
+          <button
+            id="close-prestige"
+            class="text-purple-200 hover:text-white text-3xl font-bold transition"
+          >
+            ×
+          </button>
+        </div>
+        
+        <!-- Conteúdo será inserido pelo JavaScript -->
+        <div id="prestige-sidebar-content" class="p-6">
+          <!-- Conteúdo será inserido pelo JavaScript -->
+        </div>
+      </div>
+
+      <!-- Overlay para fechar sidebar de Prestígio -->
+      <div
+        id="prestige-overlay"
+        class="hidden fixed inset-0 bg-black bg-opacity-60 z-40"
+      ></div>
+
+      <!-- Sidebar de Motor Quântico -->
+      <div
+        id="procedural-sidebar"
+        class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-dark-card shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto"
+      >
+        <!-- Header do Sidebar -->
+        <div class="sticky top-0 bg-gradient-to-r from-blue-900 to-cyan-900 border-b border-blue-600 p-4 flex justify-between items-center">
+          <h2 class="text-2xl font-bold text-blue-200">🚀 Motor Quântico</h2>
+          <button
+            id="close-procedural"
+            class="text-blue-200 hover:text-white text-3xl font-bold transition"
+          >
+            ×
+          </button>
+        </div>
+        
+        <!-- Conteúdo será inserido pelo JavaScript -->
+        <div id="procedural-sidebar-content" class="p-6">
+          <!-- Conteúdo será inserido pelo JavaScript -->
+        </div>
+      </div>
+
+      <!-- Overlay para fechar sidebar de Motor Quântico -->
+      <div
+        id="procedural-overlay"
+        class="hidden fixed inset-0 bg-black bg-opacity-60 z-40"
+      ></div>
+
+      <!-- Menu Principal (Sidebar Esquerda) -->
+      <div
+        id="main-menu-sidebar"
+        class="fixed top-0 left-0 h-full w-[280px] sm:w-[320px] bg-gradient-to-b from-dark-bg to-gray-900 shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto border-r border-gray-700"
+      >
+        <!-- Header do Menu -->
+        <div class="sticky top-0 bg-gradient-to-r from-dark-bg to-gray-800 border-b border-gray-700 p-4 flex justify-between items-center backdrop-blur-sm bg-opacity-95">
+          <h2 class="text-xl font-bold text-primary">📋 Menu</h2>
+          <button
+            id="close-main-menu"
+            class="text-gray-400 hover:text-white text-3xl font-bold transition"
+          >
+            ×
+          </button>
+        </div>
+        
+        <!-- Opções do Menu -->
+        <div class="p-4 space-y-3">
+          <!-- Ranking -->
+          <button
+            id="menu-leaderboard-button"
+            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-4 rounded-lg transition duration-150 shadow-md flex items-center justify-between group"
+          >
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">🏆</span>
+              <span class="text-base">Ranking</span>
+            </div>
+            <span class="text-xl group-hover:translate-x-1 transition-transform">→</span>
+          </button>
+
+          <!-- Meu ID / Cloud Save -->
+          <button
+            id="menu-my-id-button"
+            class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-4 rounded-lg transition duration-150 shadow-md flex items-center justify-between group"
+          >
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">☁️</span>
+              <div class="text-left">
+                <div class="text-base">Salvar na Nuvem</div>
+                <div class="text-xs text-green-200 opacity-80">Meu ID</div>
+              </div>
+            </div>
+            <span class="text-xl group-hover:translate-x-1 transition-transform">→</span>
+          </button>
+
+          <!-- Ascensão -->
+          <button
+            id="menu-prestige-button"
+            class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-150 shadow-md flex items-center justify-between group"
+          >
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">⭐</span>
+              <div class="text-left">
+                <div class="text-base">Ascensão</div>
+                <div class="text-xs text-purple-200 opacity-80">Prestígio</div>
+              </div>
+            </div>
+            <span class="text-xl group-hover:translate-x-1 transition-transform">→</span>
+          </button>
+
+          <!-- Motor Quântico -->
+          <button
+            id="menu-procedural-button"
+            class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-3 px-4 rounded-lg transition duration-150 shadow-md flex items-center justify-between group"
+          >
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">🚀</span>
+              <div class="text-left">
+                <div class="text-base">Motor Quântico</div>
+                <div class="text-xs text-cyan-200 opacity-80">Procedural</div>
+              </div>
+            </div>
+            <span class="text-xl group-hover:translate-x-1 transition-transform">→</span>
+          </button>
+
+          <!-- Divisor -->
+          <div class="border-t border-gray-700 my-4"></div>
+
+          <!-- Informações do Jogador -->
+          <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg p-4 border border-gray-700">
+            <div class="flex items-center space-x-2 mb-2">
+              <span class="text-2xl">👤</span>
+              <span class="text-sm font-semibold text-gray-300">Jogador</span>
+            </div>
+            <div id="menu-player-name" class="text-primary font-bold text-base truncate">
+              Carregando...
+            </div>
+            <div id="menu-player-level" class="text-xs text-gray-400 mt-1">
+              Nível de Ascensão: 0
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overlay para fechar Menu Principal -->
+      <div
+        id="main-menu-overlay-close"
+        class="hidden fixed inset-0 bg-black bg-opacity-60 z-40"
+      ></div>
     </div>
     <!-- Fim do Conteúdo do Jogo -->
 
