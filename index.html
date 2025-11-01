@@ -6,6 +6,13 @@
     <title>Clicker de Mineração de Moedas</title>
     <!-- Carrega Tailwind CSS para estilização -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Fonte Pixel Art -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+      rel="stylesheet"
+    />
     <script>
       tailwind.config = {
         theme: {
@@ -17,7 +24,8 @@
               "dark-card": "#2c2c54",
             },
             fontFamily: {
-              sans: ["Inter", "sans-serif"],
+              sans: ["VT323", "monospace"],
+              pixel: ["Press Start 2P", "cursive"],
             },
           },
         },
@@ -25,7 +33,9 @@
     </script>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body class="p-4 md:p-8 flex flex-col items-center">
+  <body class="p-2 md:p-4 flex flex-col items-center pixel-bg">
+    <!-- Efeito de Scanlines (linhas de TV antiga) -->
+    <div class="scanlines fixed inset-0 pointer-events-none z-[200]"></div>
     <!-- ⛏️ Áudio de Fundo - Música com Vibe de Mineração ⛏️ -->
     <audio id="background-music" loop preload="auto">
       <!-- 
@@ -86,13 +96,13 @@
         <div class="space-y-4">
           <button
             id="continue-button"
-            class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-xl text-xl shadow-2xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 hidden"
+            class="theme-button w-full text-white font-bold py-4 px-8 rounded-xl text-xl shadow-2xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 hidden"
           >
             ▶ Continuar
           </button>
           <button
             id="new-game-button"
-            class="w-full bg-gradient-to-r from-primary to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 text-dark-bg font-bold py-4 px-8 rounded-xl text-xl shadow-2xl transition-all duration-200 transform hover:scale-105"
+            class="theme-button w-full text-white font-bold py-4 px-8 rounded-xl text-xl shadow-2xl transition-all duration-200 transform hover:scale-105"
           >
             🎮 Start New Game
           </button>
@@ -115,159 +125,203 @@
 
     <!-- Conteúdo do Jogo (escondido inicialmente) -->
     <div id="game-content" class="game-content flex-col items-center w-full">
-      <header class="text-center mb-8">
-        <div class="flex justify-between items-center mb-4 px-4">
+      <header class="text-center mb-4 pixel-header">
+        <div class="flex justify-between items-center mb-3 px-2">
           <div class="flex items-center space-x-2">
             <button
               id="leaderboard-button"
-              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg transition duration-150 shadow-md flex items-center space-x-2 text-sm sm:text-base"
+              class="theme-button pixel-button-small text-white font-bold py-1.5 px-2 sm:px-3 text-xs sm:text-sm flex items-center space-x-1"
             >
               <span>🏆</span>
-              <span class="hidden sm:inline">Ranking</span>
+              <span class="hidden sm:inline">Rank</span>
             </button>
             <button
               id="my-id-button"
-              class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg transition duration-150 shadow-md flex items-center space-x-2 text-sm sm:text-base"
+              class="theme-button pixel-button-small text-white font-bold py-1.5 px-2 sm:px-3 text-xs sm:text-sm flex items-center space-x-1"
             >
               <span>🆔</span>
-              <span class="hidden sm:inline">Meu ID</span>
+              <span class="hidden sm:inline">ID</span>
+            </button>
+            <button
+              id="stats-button"
+              class="theme-button pixel-button-small text-white font-bold py-1.5 px-2 sm:px-3 text-xs sm:text-sm flex items-center space-x-1"
+            >
+              <span>📊</span>
+              <span class="hidden sm:inline">Stats</span>
             </button>
           </div>
           <img
             src="assets/logo-minerador-moedas.png"
             alt="Minerador de Moedas"
-            class="max-w-[150px] sm:max-w-[200px] h-auto"
+            class="max-w-[120px] sm:max-w-[150px] h-auto pixel-logo"
             id="game-logo"
           />
-          <div class="w-[60px] sm:w-[100px]"></div> <!-- Spacer para alinhar -->
+          <div class="w-[60px] sm:w-[100px]"></div>
         </div>
-        <p class="text-gray-400 text-sm mb-2">
-          Progresso salvo automaticamente a cada 5 segundos.
-        </p>
 
         <!-- Barra de Progresso do Mundo -->
-        <div class="w-full max-w-md mx-auto mt-4">
-          <div class="flex items-center justify-between mb-2">
+        <div class="pixel-border-inline p-2 mb-2 max-w-lg mx-auto">
+          <div class="flex items-center justify-between mb-1">
             <span
-              class="text-xs font-semibold text-primary"
+              class="text-xs font-semibold text-primary pixel-text"
               id="current-world-name"
             >
-              Mundo: Natureza
+              🌍 Mundo: Natureza
             </span>
-            <span class="text-xs text-gray-400" id="world-progress-text">
-              0 / 10,000
+            <span
+              class="text-xs text-gray-400 pixel-text"
+              id="world-progress-text"
+            >
+              0 / 10K
             </span>
           </div>
-          <div class="w-full bg-gray-700 rounded-full h-3 mb-2">
+          <div class="w-full bg-gray-800 h-4 mb-1 pixel-progress-bg">
             <div
               id="world-progress-bar"
-              class="bg-primary h-3 rounded-full transition-all duration-300"
+              class="bg-primary h-full transition-all duration-300 pixel-progress"
               style="width: 0%"
             ></div>
           </div>
           <button
             id="advance-world-button"
-            class="hidden w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all duration-200 transform hover:scale-105"
+            class="theme-button pixel-button hidden w-full text-white font-bold py-1.5 px-3 text-xs mt-1"
           >
-            🌍 Avançar para o Próximo Mundo
+            ⬆️ Avançar Mundo
           </button>
         </div>
+
+        <p class="text-xs text-gray-400 pixel-text-small mb-2">
+          💾 Auto-save a cada 5s
+        </p>
       </header>
 
-      <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Painel de Estatísticas e Clicker (menor) -->
+      <main
+        class="w-full max-w-[1400px] grid grid-cols-1 lg:grid-cols-12 gap-3 pixel-grid"
+      >
+        <!-- Painel de Estatísticas e Clicker (Esquerda) -->
         <section
-          class="lg:col-span-3 bg-dark-card p-4 rounded-xl shadow-2xl flex flex-col items-center"
+          class="lg:col-span-3 pixel-panel p-3 flex flex-col items-center"
         >
-          <h2 class="text-xl font-bold mb-3 text-primary">Moedas Atuais</h2>
-
-          <p
-            id="coins-display"
-            class="text-4xl font-black mb-3 transition-transform duration-300"
-          >
-            0.00
-          </p>
-
-          <!-- CPS Display com multiplicador de Power ativo (se houver) -->
-          <p id="cps-display" class="text-sm text-gray-300 mb-4">
-            0.00 Moedas/Segundo
-          </p>
+          <div class="pixel-border w-full mb-3 p-3">
+            <h2 class="text-lg font-bold mb-2 text-primary pixel-text">
+              💰 Moedas
+            </h2>
+            <p
+              id="coins-display"
+              class="text-3xl font-black mb-2 transition-transform duration-300 pixel-number"
+            >
+              0
+            </p>
+            <p id="cps-display" class="text-xs text-gray-300 pixel-text">
+              0 Moedas/Seg
+            </p>
+          </div>
 
           <!-- Botão Principal de Click -->
           <button
             id="click-button"
-            class="click-button bg-primary text-dark-bg font-extrabold py-3 px-6 rounded-full text-base shadow-xl hover:bg-yellow-400 transition duration-150 flex items-center justify-center space-x-2 w-full"
+            class="click-button pixel-button relative overflow-hidden text-dark-bg font-black py-5 px-6 w-full pixel-button-large"
           >
-            <span class="text-2xl">💰</span>
-            <span class="text-xs">Minerar ( +1 )</span>
+            <!-- Conteúdo do botão -->
+            <div class="relative z-10 flex flex-col items-center space-y-2">
+              <span class="text-4xl animate-bounce-slow pixel-emoji">💰</span>
+              <div class="flex flex-col items-center">
+                <span
+                  class="text-sm font-bold uppercase tracking-wider pixel-text"
+                  >Minerar</span
+                >
+                <span
+                  id="click-amount-display"
+                  class="text-xs font-semibold opacity-90 pixel-text"
+                  >+1 Moedas</span
+                >
+              </div>
+            </div>
+            <!-- Efeito de partículas ao clicar -->
+            <div
+              id="click-particles"
+              class="absolute inset-0 pointer-events-none"
+            ></div>
           </button>
 
-          <!-- Display de CPC com multiplicador de Power ativo (se houver) -->
-          <p id="click-rate-display" class="text-xs text-gray-400 mt-2">
-            Moedas/Clique: 1
-          </p>
-
-          <!-- Display de Crítico -->
-          <p id="crit-display" class="text-xs text-red-400 mt-1">
-            Chance de Crítico: 5% (x10)
-          </p>
+          <!-- Stats Info -->
+          <div class="pixel-border w-full mt-3 p-2 pixel-text-small">
+            <p id="click-rate-display" class="text-xs text-gray-300">
+              CPC: <span class="text-primary font-bold">1</span>
+            </p>
+            <p id="crit-display" class="text-xs text-red-400 mt-1">
+              Crítico: <span class="font-bold">5%</span> (x10)
+            </p>
+          </div>
 
           <!-- Botão de Poder -->
           <button
             id="power-button"
-            class="mt-4 w-full py-2 px-4 rounded-lg font-bold text-sm transition duration-150 shadow-md bg-indigo-600 hover:bg-indigo-700 text-white"
+            class="theme-button pixel-button mt-3 w-full py-2 px-3 text-sm text-white font-bold"
           >
-            Ativar Hyper-Mineração
+            ⚡ Hyper-Mineração
           </button>
-          <p id="power-timer" class="text-xs text-gray-400 mt-1"></p>
+          <p
+            id="power-timer"
+            class="text-xs text-gray-400 mt-1 pixel-text-small"
+          ></p>
 
           <!-- Mochila -->
-          <div class="mt-6 w-full">
-            <h3 class="text-sm font-bold mb-2 text-primary">Mochila (Ativo)</h3>
-            <div id="bag-container" class="grid grid-cols-3 gap-2 mb-3">
+          <div class="pixel-border w-full mt-3 p-2">
+            <h3 class="text-xs font-bold mb-2 text-primary pixel-text">
+              🎒 Mochila
+            </h3>
+            <div id="bag-container" class="grid grid-cols-3 gap-1.5 mb-2">
               <!-- Itens da mochila serão inseridos aqui pelo JavaScript -->
             </div>
           </div>
 
           <!-- Inventário -->
-          <div class="mt-2 w-full">
-            <h3 class="text-sm font-bold mb-2 text-primary">Inventário</h3>
+          <div class="pixel-border w-full mt-2 p-2">
+            <h3 class="text-xs font-bold mb-2 text-primary pixel-text">
+              📦 Inventário
+            </h3>
             <div
               id="inventory-container"
-              class="grid grid-cols-4 gap-2 max-h-[200px] overflow-y-auto"
+              class="grid grid-cols-4 gap-1.5 max-h-[180px] overflow-y-auto pixel-scroll"
             >
               <!-- Itens serão inseridos aqui pelo JavaScript -->
             </div>
           </div>
         </section>
 
-        <!-- Painel de Upgrades -->
-        <section class="lg:col-span-6 bg-dark-card p-6 rounded-xl shadow-2xl">
-          <h2
-            class="text-2xl font-bold mb-6 text-primary border-b border-primary/50 pb-2"
+        <!-- Painel de Upgrades (Centro) -->
+        <section class="lg:col-span-6 pixel-panel p-4">
+          <div class="pixel-border-header mb-4 pb-2">
+            <h2 class="text-xl font-bold text-primary pixel-text-header">
+              ⬆️ UPGRADES
+            </h2>
+          </div>
+          <div
+            id="upgrades-container"
+            class="space-y-2 pixel-scroll max-h-[calc(100vh-180px)] overflow-y-auto"
           >
-            Upgrades (Níveis Infinitos)
-          </h2>
-          <div id="upgrades-container" class="space-y-4">
             <!-- Upgrades serão inseridos aqui pelo JavaScript -->
           </div>
-          <!-- Container para Upgrades Bloqueados que dão dica -->
-          <div id="locked-upgrades-container" class="space-y-4 mt-6">
+          <!-- Container para Upgrades Bloqueados -->
+          <div id="locked-upgrades-container" class="space-y-2 mt-4">
             <!-- Dicas de Upgrades Bloqueados serão inseridas aqui -->
           </div>
         </section>
 
-        <!-- Painel de Conquistas (Lateral Direita) -->
-        <section class="lg:col-span-3 bg-dark-card p-4 rounded-xl shadow-2xl">
-          <h2
-            class="text-xl font-bold mb-4 text-primary flex items-center space-x-2"
-          >
-            <span>🏆</span>
-            <span>Conquistas</span>
-          </h2>
+        <!-- Painel de Conquistas (Direita) -->
+        <section class="lg:col-span-3 pixel-panel p-3">
+          <div class="pixel-border-header mb-3 pb-2">
+            <h2
+              class="text-lg font-bold text-primary pixel-text-header flex items-center space-x-2"
+            >
+              <span>🏆</span>
+              <span>Conquistas</span>
+            </h2>
+          </div>
           <div
             id="achievements-container"
-            class="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto"
+            class="space-y-2 max-h-[calc(100vh-180px)] overflow-y-auto pixel-scroll"
           >
             <!-- Conquistas serão inseridas aqui pelo JavaScript -->
           </div>
@@ -293,7 +347,9 @@
         class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-dark-card shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto"
       >
         <!-- Header do Sidebar -->
-        <div class="sticky top-0 bg-dark-card border-b border-gray-700 p-4 flex justify-between items-center">
+        <div
+          class="sticky top-0 bg-dark-card border-b border-gray-700 p-4 flex justify-between items-center"
+        >
           <h2 class="text-2xl font-bold text-primary">🏆 Ranking Online</h2>
           <button
             id="close-leaderboard"
@@ -307,14 +363,18 @@
         <div class="p-4">
           <div id="leaderboard-list" class="space-y-2">
             <div class="text-center text-gray-400 py-8">
-              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+              <div
+                class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"
+              ></div>
               <p class="text-sm">Carregando...</p>
             </div>
           </div>
         </div>
 
         <!-- Footer do Sidebar -->
-        <div class="sticky bottom-0 bg-dark-card border-t border-gray-700 p-4 text-center">
+        <div
+          class="sticky bottom-0 bg-dark-card border-t border-gray-700 p-4 text-center"
+        >
           <p class="text-xs text-gray-400">Atualização automática a cada 10s</p>
         </div>
       </div>
@@ -325,13 +385,45 @@
         class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"
       ></div>
 
+      <!-- Modal de Estatísticas -->
+      <div
+        id="stats-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+      >
+        <div
+          class="bg-dark-card pixel-border max-w-2xl w-full mx-4 p-6 max-h-[90vh] overflow-y-auto pixel-scroll"
+        >
+          <div class="flex justify-between items-center mb-4">
+            <h2
+              class="text-2xl font-bold text-primary pixel-text-header flex items-center space-x-2"
+            >
+              <span>📊</span>
+              <span>Estatísticas</span>
+            </h2>
+            <button
+              id="close-stats-modal"
+              class="theme-button pixel-button-small text-white font-bold py-1 px-3 text-lg"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div id="stats-content" class="space-y-4">
+            <!-- Estatísticas serão inseridas aqui pelo JavaScript -->
+          </div>
+        </div>
+      </div>
+
       <!-- Modal de ID do Jogador -->
       <div
         id="player-id-modal"
         class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
       >
         <!-- Loading Animation -->
-        <div id="loading-cloud-save" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[60]">
+        <div
+          id="loading-cloud-save"
+          class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[60]"
+        >
           <div class="text-center">
             <div class="text-6xl animate-mine-swing mb-4">⛏️</div>
             <p class="text-xl text-primary font-bold">Carregando da nuvem...</p>
@@ -339,8 +431,12 @@
           </div>
         </div>
 
-        <div class="bg-dark-card rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
-          <h2 class="text-2xl font-bold text-primary mb-4 flex items-center space-x-2">
+        <div
+          class="bg-dark-card rounded-xl shadow-2xl max-w-md w-full mx-4 p-6"
+        >
+          <h2
+            class="text-2xl font-bold text-primary mb-4 flex items-center space-x-2"
+          >
             <span>☁️</span>
             <span>Salvamento em Nuvem</span>
           </h2>
@@ -348,7 +444,9 @@
           <!-- Seção: Usar ID existente -->
           <div class="mb-4">
             <div class="bg-blue-900/20 border border-blue-600 rounded-lg p-4">
-              <h3 class="text-sm font-bold text-blue-300 mb-2 flex items-center space-x-2">
+              <h3
+                class="text-sm font-bold text-blue-300 mb-2 flex items-center space-x-2"
+              >
                 <span>🔄</span>
                 <span>Carregar de outro dispositivo</span>
               </h3>
@@ -364,7 +462,7 @@
                 />
                 <button
                   id="load-id-button"
-                  class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition whitespace-nowrap"
+                  class="theme-button text-white font-bold py-2 px-4 rounded-lg transition whitespace-nowrap"
                 >
                   Carregar
                 </button>
@@ -375,7 +473,9 @@
           <!-- Seção: Meu ID -->
           <div class="border-t border-gray-700 pt-4 mb-4">
             <div class="bg-green-900/20 border border-green-600 rounded-lg p-4">
-              <h3 class="text-sm font-bold text-green-300 mb-2 flex items-center space-x-2">
+              <h3
+                class="text-sm font-bold text-green-300 mb-2 flex items-center space-x-2"
+              >
                 <span>🆔</span>
                 <span>Meu ID único</span>
               </h3>
@@ -392,7 +492,7 @@
                 />
                 <button
                   id="copy-id-button"
-                  class="bg-primary hover:bg-yellow-400 text-dark-bg font-bold py-2 px-3 rounded-lg transition"
+                  class="theme-button text-white font-bold py-2 px-3 rounded-lg transition"
                   title="Copiar ID"
                 >
                   📋
@@ -403,13 +503,15 @@
 
           <div class="bg-gray-700/30 rounded-lg p-3 mb-4">
             <p class="text-xs text-gray-300 text-center">
-              💡 <strong>Como usar:</strong> Copie seu ID e salve em um lugar seguro. Use-o em qualquer dispositivo para manter seu progresso sincronizado!
+              💡 <strong>Como usar:</strong> Copie seu ID e salve em um lugar
+              seguro. Use-o em qualquer dispositivo para manter seu progresso
+              sincronizado!
             </p>
           </div>
 
           <button
             id="close-id-modal"
-            class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition"
+            class="theme-button w-full text-white font-bold py-2 px-4 rounded-lg transition"
           >
             Fechar
           </button>
@@ -430,5 +532,6 @@
     <script src="js/systems/achievements.js"></script>
     <script src="js/systems/inventory.js"></script>
     <script src="js/systems/upgrades.js"></script>
+    <script src="js/systems/stats.js"></script>
   </body>
 </html>

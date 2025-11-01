@@ -506,22 +506,22 @@ function renderAchievements() {
     const progressPercent = Math.min(progress * 100, 100);
 
     const card = document.createElement("div");
-    card.className = `achievement-card p-3 rounded-lg transition duration-200 ${
+    card.className = `achievement-card pixel-border p-2 transition duration-200 ${
       isCompleted
-        ? "bg-yellow-500/20 border-2 border-yellow-400"
-        : "bg-gray-700/50 border border-gray-600"
+        ? "bg-green-900/20 border-green-500"
+        : "bg-gray-800/50 border-gray-600"
     }`;
 
     card.innerHTML = `
       <div class="flex items-start justify-between mb-1">
         <div class="flex items-center space-x-2 flex-1 min-w-0">
-          <span class="text-2xl flex-shrink-0">${achievement.icon}</span>
+          <span class="text-xl flex-shrink-0 pixel-emoji">${achievement.icon}</span>
           <div class="min-w-0 flex-1">
-            <h3 class="text-sm font-bold text-white flex items-center space-x-1 truncate">
+            <h3 class="text-xs font-bold text-white flex items-center space-x-1 truncate pixel-text">
               <span class="truncate">${achievement.name}</span>
               ${
                 isCompleted
-                  ? '<span class="text-green-400 text-base flex-shrink-0">✓</span>'
+                  ? '<span class="text-green-400 text-sm flex-shrink-0 pixel-text">✓</span>'
                   : ""
               }
             </h3>
@@ -529,28 +529,28 @@ function renderAchievements() {
         </div>
         <span class="text-xs font-semibold ${getDifficultyClass(
           achievement.difficulty
-        )} flex-shrink-0 ml-1">
+        )} flex-shrink-0 ml-1 pixel-text-small">
           ${getDifficultyText(achievement.difficulty)}
         </span>
       </div>
-      <p class="text-xs text-gray-300 mb-2 line-clamp-2">${
+      <p class="text-xs text-gray-300 mb-2 line-clamp-2 pixel-text-small">${
         achievement.description
       }</p>
       <div class="mb-1">
-        <div class="w-full bg-gray-700 rounded-full h-1.5">
+        <div class="w-full bg-gray-800 h-2 pixel-progress-bg">
           <div
-            class="bg-yellow-400 h-1.5 rounded-full transition-all duration-300"
+            class="bg-primary h-2 transition-all duration-300 pixel-progress"
             style="width: ${progressPercent}%"
           ></div>
         </div>
-        <p class="text-xs text-gray-400 mt-0.5">
+        <p class="text-xs text-gray-400 mt-0.5 pixel-text-small">
           ${currentValue} / ${targetValue}
         </p>
       </div>
       ${
         isCompleted
-          ? `<div class="mt-1 pt-1 border-t border-yellow-400/30">
-               <p class="text-xs text-yellow-300 font-semibold">
+          ? `<div class="mt-1 pt-1 border-t border-primary/30">
+               <p class="text-xs text-primary font-semibold pixel-text-small">
                  Bônus: +${achievement.bonus} moedas
                </p>
              </div>`
